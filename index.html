@@ -42,7 +42,25 @@
 
   <script>
     const LIFF_ID = "2011856045-PfCKIOb3";
+    const APPSHEET_APP_ID = "47b2ca67-2125-4894-a431-77b02353d24b";
+    const APPSHEET_FORM_VIEW = "DRIFTER 線上預約";
     const statusEl = document.getElementById("status");
+
+    function buildAppSheetUrl(userId) {
+      const defaults = JSON.stringify({
+        "LINE User ID": userId
+      });
+
+      return (
+        "https://www.appsheet.com/start/" +
+        APPSHEET_APP_ID +
+        "#control=" +
+        encodeURIComponent(APPSHEET_FORM_VIEW) +
+        "&defaults=" +
+        encodeURIComponent(defaults) +
+        "&page=form"
+      );
+    }
 
     async function start() {
       try {
@@ -56,14 +74,19 @@
         const profile = await liff.getProfile();
         const userId = profile.userId || "";
 
-        window.DRIFTER_LINE_USER_ID = userId;
-
-        const masked = userId
-          ? userId.slice(0, 8) + "••••••••"
-          : "(未取得)";
+        if (!userId) {
+          throw new Error("未取得 LINE User ID");
+        }
 
         statusEl.innerHTML =
-          "LINE 身分取得成功 ✅<br><span class='muted'>" + masked + "</span>";
+          "LINE 身分確認成功 ✅<br><span class='muted'>正在進入 DRIFTER 線上預約…</span>";
+
+        const targetUrl = buildAppSheetUrl(userId);
+
+        setTimeout(() => {
+          window.location.href = targetUrl;
+        }, 500);
+
       } catch (err) {
         statusEl.innerHTML =
           "LINE 身分取得失敗 ❌<br><span class='muted'>" +
