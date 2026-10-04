@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>DRIFTER 線上預約</title>
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #fff;
+      color: #111;
+      text-align: center;
+    }
+    main {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 72px 24px;
+    }
+    h1 {
+      font-size: 28px;
+      line-height: 1.25;
+      margin: 0 0 28px;
+    }
+    #status {
+      font-size: 18px;
+      line-height: 1.7;
+      white-space: pre-line;
+    }
+    .muted {
+      color: #777;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>DRIFTER SPORTS MASSAGE</h1>
+    <div id="status">正在確認 LINE 身分…</div>
+  </main>
+
+  <script>
+    const LIFF_ID = "2011856045-PfCKIOb3";
+    const statusEl = document.getElementById("status");
+
+    async function start() {
+      try {
+        await liff.init({ liffId: LIFF_ID });
+
+        if (!liff.isLoggedIn()) {
+          liff.login({ redirectUri: window.location.href });
+          return;
+        }
+
+        const profile = await liff.getProfile();
+        const userId = profile.userId || "";
+
+        window.DRIFTER_LINE_USER_ID = userId;
+
+        const masked = userId
+          ? userId.slice(0, 8) + "••••••••"
+          : "(未取得)";
+
+        statusEl.innerHTML =
+          "LINE 身分取得成功 ✅<br><span class='muted'>" + masked + "</span>";
+      } catch (err) {
+        statusEl.innerHTML =
+          "LINE 身分取得失敗 ❌<br><span class='muted'>" +
+          (err && err.message ? err.message : String(err)) +
+          "</span>";
+      }
+    }
+
+    window.addEventListener("load", start);
+  </script>
+</body>
+</html>
