@@ -31,6 +31,8 @@
       padding: 14px 8px; font-size: 16px;
     }
     .type-btn.active { border: 2px solid #111; font-weight: 700; }
+    .type-btn:disabled { opacity: .42; cursor: not-allowed; }
+    .eligibility-note { color: #666; font-size: 13px; line-height: 1.55; margin-top: 8px; }
     .note { color: #666; font-size: 14px; line-height: 1.65; margin-top: 16px; }
     .status { text-align: center; padding: 42px 12px; line-height: 1.8; }
     .submit {
@@ -64,9 +66,10 @@
 
       <label>預約身份 *</label>
       <div class="types">
-        <button type="button" class="type-btn" data-value="第一次體驗">第一次體驗</button>
+        <button id="firstExperienceBtn" type="button" class="type-btn" data-value="第一次體驗" disabled>第一次體驗</button>
         <button type="button" class="type-btn" data-value="單次">單次</button>
       </div>
+      <div id="firstExperienceNote" class="eligibility-note">正在確認第一次體驗資格…</div>
 
       <label for="date">預約日期 *</label>
       <input id="date" name="date" type="date" required>
@@ -103,6 +106,8 @@
   const tokenInput = document.getElementById('id_token');
   const formError = document.getElementById('formError');
   const submitBtn = document.getElementById('submitBtn');
+  const firstExperienceBtn = document.getElementById('firstExperienceBtn');
+  const firstExperienceNote = document.getElementById('firstExperienceNote');
 
   function todayLocal() {
     const d = new Date();
@@ -110,6 +115,47 @@
     const m = String(d.getMonth()+1).padStart(2,'0');
     const day = String(d.getDate()).padStart(2,'0');
     return `${y}-${m}-${day}`;
+  }
+
+  async function sha256Hex(value) {
+    const data = new TextEncoder().encode(value);
+    const digest = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(digest))
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join('');
+  }
+
+  function loadFirstExperienceEligibility(lineKey) {
+    const callbackName = 'drifterFirstExp_' + Date.now();
+
+    window[callbackName] = function(data) {
+      delete window[callbackName];
+      script.remove();
+
+      const eligible = !!(data && data.ok && data.eligible);
+      firstExperienceBtn.disabled = !eligible;
+
+      if (eligible) {
+        firstExperienceBtn.textContent = '第一次體驗';
+        firstExperienceNote.textContent = '第一次體驗每位客戶限一次。';
+      } else {
+        firstExperienceBtn.textContent = '第一次體驗（已使用）';
+        firstExperienceBtn.classList.remove('active');
+        if (typeInput.value === '第一次體驗') typeInput.value = '';
+        firstExperienceNote.textContent = '您已使用過第一次體驗，請選擇「單次」。';
+      }
+    };
+
+    const script = document.createElement('script');
+    script.onerror = function() {
+      delete window[callbackName];
+      script.remove();
+      // UI 查詢失敗時仍允許選擇；送出時後端會再做一次權威驗證。
+      firstExperienceBtn.disabled = false;
+      firstExperienceNote.textContent = '第一次體驗資格將於送出預約時再次確認。';
+    };
+    script.src = `${BACKEND_URL}?action=firstExperienceEligibility&lineKey=${encodeURIComponent(lineKey)}&callback=${callbackName}`;
+    document.body.appendChild(script);
   }
 
   function loadAvailability(date) {
@@ -195,9 +241,20 @@
       const idToken = liff.getIDToken();
       if (!idToken) throw new Error('無法取得 LINE 登入憑證');
 
+      const profile = await liff.getProfile();
+      const lineUserId = profile && profile.userId ? profile.userId : '';
+
       tokenInput.value = idToken;
       form.action = BACKEND_URL;
       dateInput.min = todayLocal();
+
+      if (lineUserId && window.crypto && crypto.subtle) {
+        const lineKey = await sha256Hex(lineUserId);
+        loadFirstExperienceEligibility(lineKey);
+      } else {
+        firstExperienceBtn.disabled = false;
+        firstExperienceNote.textContent = '第一次體驗資格將於送出預約時確認。';
+      }
 
       loading.classList.add('hidden');
       form.classList.remove('hidden');
