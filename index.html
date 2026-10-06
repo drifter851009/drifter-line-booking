@@ -32,6 +32,8 @@
     }
     .type-btn.active { border: 2px solid #111; font-weight: 700; }
     .type-btn:disabled { opacity: .42; cursor: not-allowed; }
+    .type-btn.member { grid-column: 1 / -1; }
+    .member-note { color: #555; font-size: 13px; line-height: 1.55; margin-top: 8px; }
     .eligibility-note { color: #666; font-size: 13px; line-height: 1.55; margin-top: 8px; }
     .note { color: #666; font-size: 14px; line-height: 1.65; margin-top: 16px; }
     .status { text-align: center; padding: 42px 12px; line-height: 1.8; }
@@ -67,9 +69,11 @@
       <label>預約身份 *</label>
       <div class="types">
         <button id="firstExperienceBtn" type="button" class="type-btn" data-value="第一次體驗" disabled>第一次體驗</button>
-        <button type="button" class="type-btn" data-value="單次">單次</button>
+        <button id="singleBtn" type="button" class="type-btn" data-value="單次">單次</button>
+        <button id="memberBtn" type="button" class="type-btn member hidden" data-value="會員預約" disabled>會員預約</button>
       </div>
       <div id="firstExperienceNote" class="eligibility-note">正在確認第一次體驗資格…</div>
+      <div id="memberNote" class="member-note hidden"></div>
 
       <label for="date">預約日期 *</label>
       <input id="date" name="date" type="date" required>
@@ -108,6 +112,11 @@
   const submitBtn = document.getElementById('submitBtn');
   const firstExperienceBtn = document.getElementById('firstExperienceBtn');
   const firstExperienceNote = document.getElementById('firstExperienceNote');
+  const memberBtn = document.getElementById('memberBtn');
+  const memberNote = document.getElementById('memberNote');
+  const phoneInput = document.getElementById('phone');
+  let currentLineKey = '';
+  let lastEligibilityPhone = '';
 
   function todayLocal() {
     const d = new Date();
@@ -123,6 +132,100 @@
     return Array.from(new Uint8Array(digest))
       .map(b => b.toString(16).padStart(2, '0'))
       .join('');
+  }
+
+  function setSelectedType(value) {
+    document.querySelectorAll('.type-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.value === value);
+    });
+    typeInput.value = value || '';
+  }
+
+  function resetMemberState() {
+    memberBtn.disabled = true;
+    memberBtn.classList.add('hidden');
+    memberBtn.textContent = '會員預約';
+    memberNote.classList.add('hidden');
+    memberNote.textContent = '';
+    if (typeInput.value === '會員預約') setSelectedType('');
+  }
+
+  function applyBookingEligibility(data) {
+    const ok = !!(data && data.ok);
+    if (!ok) return;
+
+    const firstEligible = !!data.firstExperienceEligible;
+    firstExperienceBtn.disabled = !firstEligible;
+    if (firstEligible) {
+      firstExperienceBtn.textContent = '第一次體驗';
+      firstExperienceNote.textContent = '第一次體驗每位客戶限一次。';
+    } else {
+      firstExperienceBtn.textContent = '第一次體驗（已使用）';
+      firstExperienceBtn.classList.remove('active');
+      if (typeInput.value === '第一次體驗') typeInput.value = '';
+      firstExperienceNote.textContent = '系統已辨識為既有客戶，第一次體驗不可再次使用。';
+    }
+
+    const memberFound = !!data.memberFound;
+    const memberEligible = !!data.memberEligible;
+    const remaining = Number(data.remainingSessions || 0);
+
+    if (memberEligible) {
+      memberBtn.disabled = false;
+      memberBtn.classList.remove('hidden');
+      memberBtn.textContent = `會員預約｜剩餘 ${remaining} 堂`;
+      memberNote.classList.remove('hidden');
+      memberNote.textContent = '已辨識為堂數會員；本次預約不會先扣堂，服務完成後才扣除。';
+
+      // 既有堂數會員預設帶入「會員預約」，仍可手動改選單次。
+      if (!typeInput.value || typeInput.value === '第一次體驗') {
+        setSelectedType('會員預約');
+      }
+    } else {
+      memberBtn.disabled = true;
+      memberBtn.classList.add('hidden');
+      memberBtn.textContent = '會員預約';
+      if (typeInput.value === '會員預約') setSelectedType('');
+
+      if (memberFound) {
+        memberNote.classList.remove('hidden');
+        memberNote.textContent = '已找到會員資料，但目前沒有可使用堂數；請選擇「單次」。';
+      } else {
+        memberNote.classList.add('hidden');
+        memberNote.textContent = '';
+      }
+    }
+  }
+
+  async function loadBookingEligibilityForPhone(phone) {
+    const normalized = String(phone || '').replace(/\D/g, '');
+    if (!/^09\d{8}$/.test(normalized) || !currentLineKey) {
+      resetMemberState();
+      return;
+    }
+
+    if (lastEligibilityPhone === normalized) return;
+    lastEligibilityPhone = normalized;
+
+    const phoneKey = await sha256Hex(normalized);
+    const callbackName = 'drifterBookingEligibility_' + Date.now();
+
+    window[callbackName] = function(data) {
+      delete window[callbackName];
+      script.remove();
+      applyBookingEligibility(data);
+    };
+
+    const script = document.createElement('script');
+    script.onerror = function() {
+      delete window[callbackName];
+      script.remove();
+      resetMemberState();
+      memberNote.classList.remove('hidden');
+      memberNote.textContent = '會員資格讀取失敗；送出預約時系統仍會再次確認。';
+    };
+    script.src = `${BACKEND_URL}?action=bookingEligibility&lineKey=${encodeURIComponent(currentLineKey)}&phoneKey=${encodeURIComponent(phoneKey)}&callback=${callbackName}`;
+    document.body.appendChild(script);
   }
 
   function loadFirstExperienceEligibility(lineKey) {
@@ -190,11 +293,24 @@
 
   document.querySelectorAll('.type-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      typeInput.value = btn.dataset.value;
+      if (btn.disabled) return;
+      setSelectedType(btn.dataset.value);
       formError.textContent = '';
     });
+  });
+
+  phoneInput.addEventListener('input', () => {
+    const normalized = phoneInput.value.replace(/\D/g, '');
+    if (!/^09\d{8}$/.test(normalized)) {
+      lastEligibilityPhone = '';
+      resetMemberState();
+      return;
+    }
+    loadBookingEligibilityForPhone(normalized);
+  });
+
+  phoneInput.addEventListener('blur', () => {
+    loadBookingEligibilityForPhone(phoneInput.value);
   });
 
   dateInput.addEventListener('change', () => {
@@ -249,8 +365,11 @@
       dateInput.min = todayLocal();
 
       if (lineUserId && window.crypto && crypto.subtle) {
-        const lineKey = await sha256Hex(lineUserId);
-        loadFirstExperienceEligibility(lineKey);
+        currentLineKey = await sha256Hex(lineUserId);
+        loadFirstExperienceEligibility(currentLineKey);
+        if (/^09\d{8}$/.test(phoneInput.value.replace(/\D/g, ''))) {
+          loadBookingEligibilityForPhone(phoneInput.value);
+        }
       } else {
         firstExperienceBtn.disabled = false;
         firstExperienceNote.textContent = '第一次體驗資格將於送出預約時確認。';
