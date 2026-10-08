@@ -3,6 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <title>DRIFTER 線上預約</title>
   <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
   <style>
@@ -68,7 +71,7 @@
 
       <label for="partner_code">合作優惠碼（若有）</label>
       <input id="partner_code" name="partner_code" type="text" maxlength="32"
-             placeholder="請輸入合作方提供的優惠碼" autocapitalize="characters" autocomplete="off">
+             placeholder="例如 Hank****" autocapitalize="characters" autocomplete="off">
       <div id="partnerCodeNote" class="eligibility-note">合作優惠碼不可與第一次體驗價併用。</div>
 
       <label>預約身份 *</label>
@@ -102,6 +105,7 @@
   </div>
 
 <script>
+  const FRONTEND_VERSION = 'V18';
   const LIFF_ID = '2011856045-PfCKIOb3';
 
   // 重要：把下一行換成你 Apps Script 部署後的 /exec 網址
@@ -277,7 +281,7 @@
       memberNote.classList.remove('hidden');
       memberNote.textContent = '會員資格讀取失敗；送出預約時系統仍會再次確認。';
     };
-    script.src = `${BACKEND_URL}?action=bookingEligibility&lineKey=${encodeURIComponent(currentLineKey)}&phoneKey=${encodeURIComponent(phoneKey)}&callback=${callbackName}`;
+    script.src = `${BACKEND_URL}?action=bookingEligibility&lineKey=${encodeURIComponent(currentLineKey)}&phoneKey=${encodeURIComponent(phoneKey)}&callback=${callbackName}&v=${FRONTEND_VERSION}&ts=${Date.now()}`;
     document.body.appendChild(script);
   }
 
@@ -304,7 +308,7 @@
         firstExperienceNote.textContent = '第一次體驗資格將於送出預約時再次確認。';
       }
     };
-    script.src = `${BACKEND_URL}?action=firstExperienceEligibility&lineKey=${encodeURIComponent(lineKey)}&callback=${callbackName}`;
+    script.src = `${BACKEND_URL}?action=firstExperienceEligibility&lineKey=${encodeURIComponent(lineKey)}&callback=${callbackName}&v=${FRONTEND_VERSION}&ts=${Date.now()}`;
     document.body.appendChild(script);
   }
 
@@ -362,7 +366,7 @@
       partnerCodeNote.textContent = '優惠碼確認失敗；請稍後再試。';
       refreshFirstExperienceState();
     };
-    script.src = `${BACKEND_URL}?action=partnerCodeEligibility&code=${encodeURIComponent(normalized)}&callback=${callbackName}`;
+    script.src = `${BACKEND_URL}?action=partnerCodeEligibility&code=${encodeURIComponent(normalized)}&callback=${callbackName}&v=${FRONTEND_VERSION}&ts=${Date.now()}`;
     document.body.appendChild(script);
   }
 
@@ -392,7 +396,7 @@
       delete window[callbackName];
       timeSelect.innerHTML = '<option value="">讀取時段失敗，請重新整理</option>';
     };
-    script.src = `${BACKEND_URL}?action=availability&date=${encodeURIComponent(date)}&callback=${callbackName}`;
+    script.src = `${BACKEND_URL}?action=availability&date=${encodeURIComponent(date)}&callback=${callbackName}&v=${FRONTEND_VERSION}&ts=${Date.now()}`;
     document.body.appendChild(script);
   }
 
