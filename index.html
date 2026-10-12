@@ -105,7 +105,7 @@
   </div>
 
 <script>
-  const FRONTEND_VERSION = 'V19';
+  const FRONTEND_VERSION = 'V20';
   const LIFF_ID = '2011856045-PfCKIOb3';
 
   // 重要：把下一行換成你 Apps Script 部署後的 /exec 網址
@@ -173,6 +173,13 @@
       firstExperienceBtn.classList.remove('active');
       if (typeInput.value === '第一次體驗') setSelectedType('');
       firstExperienceNote.textContent = '第一次體驗需輸入有效的一次性體驗優惠碼。';
+      return;
+    }
+
+    if (activeTrialCode && activeTrialCode.qaBypass) {
+      firstExperienceBtn.disabled = false;
+      firstExperienceBtn.textContent = '第一次體驗';
+      firstExperienceNote.textContent = 'QA 測試模式：暫時略過既有第一次體驗紀錄；此碼成功預約後即失效。';
       return;
     }
 
@@ -365,8 +372,10 @@
           `堂數購買折 NT$${activePartnerOffer.packageDiscount.toLocaleString()}。不適用第一次體驗價。`;
       } else if (valid && data.codeType === 'trial') {
         activePartnerOffer = null;
-        activeTrialCode = { code: data.code };
-        partnerCodeNote.textContent = '第一次體驗優惠碼有效｜此碼僅可成功使用一次。';
+        activeTrialCode = { code: data.code, qaBypass: !!data.qaBypass };
+        partnerCodeNote.textContent = activeTrialCode.qaBypass
+          ? 'QA 測試碼有效｜僅供本次完整流程測試，成功預約後即失效。'
+          : '第一次體驗優惠碼有效｜此碼僅可成功使用一次。';
       } else {
         activePartnerOffer = null;
         activeTrialCode = null;
