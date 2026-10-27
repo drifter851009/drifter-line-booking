@@ -1,3 +1,6 @@
+/* DRIFTER safe rollout: start pre-booking Body Check only after backend advertises full single-file build.
+   Old backend keeps existing optional-post-booking flow until user deploys the new Code.gs. */
+function drifterBodyCheckBootWhenReady_(){
 /* DRIFTER Body Check required BEFORE booking; activate only after GAS accepts body_check_json. */
 (function () {
   'use strict';
@@ -75,4 +78,25 @@
     hidden.value=JSON.stringify(d);
   },true);
   sync();
+})();
+}
+(function(){
+  'use strict';
+  if(typeof BACKEND_URL !== 'string'||!/^https:\/\/script\.google\.com\/macros\/s\//.test(BACKEND_URL))return;
+  var callback='drifterBCReady_'+Math.random().toString(36).slice(2);
+  var script=document.createElement('script');
+  var done=false;
+  function cleanup(){if(done)return;done=true;try{delete window[callback]}catch(e){window[callback]=void 0}if(script.parentNode)script.parentNode.removeChild(script)}
+  window[callback]=function(result){
+    var canEnable=!!result && result.ok===true && result.version==='2026-10-27-REQUIRED-ONEFILE';
+    cleanup();
+    if(canEnable && !window.__DRIFTER_BC_REQUIRED_BOOTED__){
+      window.__DRIFTER_BC_REQUIRED_BOOTED__=true;
+      drifterBodyCheckBootWhenReady_();
+    }
+  };
+  script.onerror=cleanup;
+  script.src=BACKEND_URL+'?action=health&callback='+encodeURIComponent(callback)+'&v='+Date.now();
+  document.head.appendChild(script);
+  setTimeout(cleanup,8000);
 })();
