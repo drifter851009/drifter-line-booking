@@ -1,6 +1,5 @@
-/* DRIFTER safe rollout: start pre-booking Body Check only after backend advertises full single-file build.
-   Old backend keeps existing optional-post-booking flow until user deploys the new Code.gs. */
-function drifterBodyCheckBootWhenReady_(){
+/* DRIFTER: single/first Body Check always visible, server version must be confirmed before submit.
+ * Existing LINE member, calendar, promo code, and time logic are unchanged. */
 /* DRIFTER Body Check required BEFORE booking; activate only after GAS accepts body_check_json. */
 (function () {
   'use strict';
@@ -53,6 +52,48 @@ function drifterBodyCheckBootWhenReady_(){
   var css=document.createElement('style');
   css.textContent='#drifterBodyCheckRequired{margin-top:25px;padding-top:15px;border-top:2px solid #ddd}#drifterBodyCheckRequired fieldset{border:1px solid #ddd;border-radius:12px;padding:14px;margin:15px 0}#drifterBodyCheckRequired legend{font-weight:bold;padding:0 6px}#drifterBodyCheckRequired h2{text-align:center;font-size:20px}#drifterBodyCheckRequired label{font-size:14px;line-height:1.5}#drifterBodyCheckRequired .drbc-options{display:flex;flex-wrap:wrap;gap:8px}#drifterBodyCheckRequired .drbc-options label{border:1px solid #ddd;padding:8px;border-radius:10px;display:flex;gap:7px;align-items:center;margin:0}#drifterBodyCheckRequired input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:#111}#drifterBodyCheckRequired .drbc-ack{display:flex;gap:10px;align-items:flex-start;margin:14px 0}#drifterBodyCheckRequired .drbc-help{color:#555;font-size:13px;line-height:1.75}#drifterBodyCheckRequired .drbc-error{color:#bb1323;font-size:14px}#drifterBodyCheckRequired[hidden]{display:none}';
   document.head.appendChild(css);form.insertBefore(root,submit);
+  var backendReady=false;
+  var backendMessage='正在核對最新預約服務…';
+  var backendStatus=document.createElement('p');
+  backendStatus.id='drbcBackendStatus';
+  backendStatus.setAttribute('role','status');
+  backendStatus.style.cssText='font-size:13px;padding:10px 12px;border-radius:8px;background:#f5f5f5;color:#555;margin:12px 0';
+  backendStatus.textContent=backendMessage;
+  root.insertBefore(backendStatus,root.children[1]||null);
+  function setBackendStatus(message,ok){
+    backendMessage=message;
+    backendStatus.textContent=message;
+    backendStatus.style.background=ok?'#ecf9f0':'#fff5ed';
+    backendStatus.style.color=ok?'#186b38':'#8d400f';
+  }
+  function probeBackend(action,allowRetry){
+    var cb='drifterBCProbe_'+Math.random().toString(36).slice(2);
+    var tag=document.createElement('script');
+    var finished=false;
+    var timeout=setTimeout(function(){finish(null);},7000);
+    function finish(payload){
+      if(finished)return;
+      finished=true;
+      clearTimeout(timeout);
+      try{delete window[cb]}catch(e){window[cb]=void 0}
+      if(tag.parentNode)tag.parentNode.removeChild(tag);
+      if(payload && payload.ok===true && payload.version==='2026-10-27-REQUIRED-ONEFILE'){
+        backendReady=true;
+        setBackendStatus('已連接正式預約系統，請完成 Body Check 後確認預約。',true);
+      }else if(allowRetry){
+        probeBackend('firstExperienceEligibility',false);
+      }else{
+        var version=payload&&payload.version?String(payload.version):'無法取得版本回應';
+        setBackendStatus('預約後端尚未確認已更新（'+version+'）。請暫勿送出，聯絡工作室確認部署版本。',false);
+      }
+    }
+    window[cb]=finish;
+    tag.onerror=function(){finish(null);};
+    tag.src=BACKEND_URL+'?action='+encodeURIComponent(action)+'&callback='+encodeURIComponent(cb)+'&ts='+Date.now();
+    document.head.appendChild(tag);
+  }
+  probeBackend('health',true);
+
   var hidden=document.createElement('input');hidden.type='hidden';hidden.name='body_check_json';form.appendChild(hidden);
   function single(){return type.value==='單次'||type.value==='第一次體驗';}
   function sync(){root.hidden=!single();if(root.hidden)hidden.value='';}
@@ -73,30 +114,10 @@ function drifterBodyCheckBootWhenReady_(){
     if(!d.improvements.length||!d.parts.length)error='請完成本次服務需求及主要關注部位。';
     else if(!d.acute)error='請回答最近兩週是否有急性傷害或明顯腫脹。';
     else if(!d.privacyConsent||!d.healthConsent||!d.truthConsent)error='請閱讀並勾選三項必要確認。';
+    else if(!backendReady)error='預約系統目前尚未確認新版必填功能。'+backendMessage;
     root.querySelector('#drifterBodyCheckRequiredError').textContent=error;
     if(error){e.preventDefault();e.stopImmediatePropagation();submit.disabled=false;submit.textContent='確認預約';root.scrollIntoView({block:'start',behavior:'smooth'});return;}
     hidden.value=JSON.stringify(d);
   },true);
   sync();
-})();
-}
-(function(){
-  'use strict';
-  if(typeof BACKEND_URL !== 'string'||!/^https:\/\/script\.google\.com\/macros\/s\//.test(BACKEND_URL))return;
-  var callback='drifterBCReady_'+Math.random().toString(36).slice(2);
-  var script=document.createElement('script');
-  var done=false;
-  function cleanup(){if(done)return;done=true;try{delete window[callback]}catch(e){window[callback]=void 0}if(script.parentNode)script.parentNode.removeChild(script)}
-  window[callback]=function(result){
-    var canEnable=!!result && result.ok===true && result.version==='2026-10-27-REQUIRED-ONEFILE';
-    cleanup();
-    if(canEnable && !window.__DRIFTER_BC_REQUIRED_BOOTED__){
-      window.__DRIFTER_BC_REQUIRED_BOOTED__=true;
-      drifterBodyCheckBootWhenReady_();
-    }
-  };
-  script.onerror=cleanup;
-  script.src=BACKEND_URL+'?action=health&callback='+encodeURIComponent(callback)+'&v='+Date.now();
-  document.head.appendChild(script);
-  setTimeout(cleanup,8000);
 })();
