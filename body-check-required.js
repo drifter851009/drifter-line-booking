@@ -22,7 +22,7 @@
     '<h2>Body Check｜預約前必填</h2><p class="drbc-help">單次與第一次體驗須先完成本次身體狀況問卷，才能確認預約。</p>'+
     '<fieldset><legend>01｜本次服務需求</legend><p>希望改善的感受 *</p>'+
     choices('improvements',['放鬆與疲勞恢復','工作久坐緊繃','運動後恢復','特定部位不適','其他'])+
-    '<p>主要關注部位 *</p>'+choices('parts',['全身','頸部','肩部','上背','下背','臀部','髖部','大腿','膝部','小腿','足部','手臂','其他'])+
+    '<p>主要關注部位 *（請選擇 1～3 個部位，60 分鐘不提供全身施作）</p>'+choices('parts',['頸部','肩部','上背','下背','臀部','髖部','大腿','膝部','小腿','足部','手臂','其他'])+
     select('side','左右側',['左側','右側','雙側','不適用'])+
     '<p>目前的感受</p>'+choices('sensations',['活動度受限','緊繃','痠痛','刺痛','疼痛','疲勞','其他'])+'</fieldset>'+
     '<fieldset><legend>02｜程度及近期變化</legend>'+
@@ -99,6 +99,16 @@
   function sync(){root.hidden=!single();if(root.hidden)hidden.value='';}
   document.querySelectorAll('.type-btn').forEach(function(b){b.addEventListener('click',sync);});
   document.getElementById('phone').addEventListener('input',function(){setTimeout(sync,0);});
+  function syncPartsLimit(){
+    var selected=root.querySelectorAll('input[name="parts"]:checked').length;
+    root.querySelectorAll('input[name="parts"]').forEach(function(box){
+      box.disabled=selected>=3 && !box.checked;
+    });
+  }
+  root.addEventListener('change',function(e){
+    if(e.target && e.target.name==='parts')syncPartsLimit();
+  });
+  syncPartsLimit();
   function all(k){return Array.from(root.querySelectorAll('[name="'+k+'"]:checked')).map(function(n){return n.value;});}
   function val(k){var x=root.querySelector('[name="'+k+'"]');return x?x.value:'';}
   function yes(k){return !!root.querySelector('[name="'+k+'"]:checked');}
@@ -111,7 +121,8 @@
       pressure:val('pressure'),notes:val('notes'),privacyConsent:yes('privacyConsent'),
       healthConsent:yes('healthConsent'),truthConsent:yes('truthConsent'),declarationVersion:VERSION};
     var error='';
-    if(!d.improvements.length||!d.parts.length)error='請完成本次服務需求及主要關注部位。';
+    if(!d.improvements.length)error='請完成本次服務需求。';
+    else if(d.parts.length<1 || d.parts.length>3)error='請選擇 1～3 個主要關注部位。';
     else if(!d.acute)error='請回答最近兩週是否有急性傷害或明顯腫脹。';
     else if(!d.privacyConsent||!d.healthConsent||!d.truthConsent)error='請閱讀並勾選三項必要確認。';
     else if(!backendReady)error='預約系統目前尚未確認新版必填功能。'+backendMessage;
