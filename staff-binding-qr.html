@@ -1,0 +1,17 @@
+<!doctype html><html lang="zh-Hant"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#171717"><title>DRIFTER｜到店綁定 QR Code</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#f1efeb;color:#191919;font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC",sans-serif}header{background:#171717;color:white;padding:22px;font-weight:800;letter-spacing:.1em}main{max-width:500px;padding:28px;margin:auto;text-align:center}section{background:white;padding:27px;border:1px solid #deddd8;border-radius:18px}h1{font-size:25px}#qr{margin:20px auto;display:flex;justify-content:center}#qr img,#qr canvas{width:260px;height:260px}p{color:#696560;line-height:1.8;font-size:14px}</style>
+<script src="./vendor/qrcode.min.js"></script></head><body><header>DRIFTER / STAFF</header>
+<main><section><h1>會員首次 LINE 綁定</h1><p id="message">正在產生 QR Code…</p>
+<div id="qr"></div><p>請讓已由工作室核對身分的會員掃描此 QR Code。每張只可使用一次，核發後 10 分鐘失效。</p></section></main>
+<script>(function(){'use strict';
+const msg=document.getElementById('message'),p=new URLSearchParams(location.hash.slice(1)),u=p.get('url')||'';
+try{const target=new URL(u),t=target.searchParams.get('ticket')||'';
+if(target.protocol!=='https:'||target.hostname!=='liff.line.me'||target.pathname!=='/2011856045-PfCKIOb3/member-bind.html'||!/^[a-f0-9]{64}$/i.test(t))throw Error('invalid ticket');
+if(typeof QRCode!=='function')throw Error('QR library unavailable');
+new QRCode(document.getElementById('qr'),{text:u,width:260,height:260,correctLevel:QRCode.CorrectLevel.M});
+msg.textContent='請由會員使用自己的 LINE 掃描';
+}catch(_){msg.textContent='綁定連結無效，請向工作室重新申請。'}
+})();</script></body></html>
