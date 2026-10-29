@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-Hant"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#151515"><meta name="robots" content="noindex,nofollow,noarchive">
+<title>DRIFTER｜Body Passport 會員專屬</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f1efeb;color:#191919;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif}
+header{background:#171717;color:#fff;padding:20px 22px;display:flex;justify-content:space-between;align-items:center}header strong{letter-spacing:.12em}header span{font-size:11px;color:#aaa;letter-spacing:.1em}
+main{max-width:620px;margin:auto;padding:38px 20px 70px}.eyebrow{font-size:11px;color:#777;letter-spacing:.18em;font-weight:700}
+h1{font-size:39px;letter-spacing:-.045em;line-height:1.15;margin:14px 0 0}h1 small{display:block;font-size:20px;letter-spacing:0;margin-top:11px}
+p{font-size:14px;line-height:1.9;color:#65615d}
+.art{background:#272727;color:white;margin:28px 0;border-radius:17px;padding:26px;min-height:198px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.art:after{content:"D";font-size:230px;font-weight:900;color:rgba(255,255,255,.05);position:absolute;right:-10px;top:-65px}
+.art span{font-size:10px;letter-spacing:.18em;color:#b1b1b1}.art h2{font-size:26px;line-height:1.25;margin:0;z-index:1}
+.panel{background:white;padding:20px;border-radius:14px;border:1px solid #e2e0dc;margin-bottom:15px}.status{font-size:15px;font-weight:800}
+#detail{font-size:13px;margin:10px 0 0}.submit{width:100%;background:#1a1a1a;color:#fff;border:0;border-radius:11px;padding:18px 12px;font-size:15px;font-weight:800}
+.submit:disabled{background:#aaa}.foot{margin-top:21px;font-size:12px;color:#898683}
+@media(max-width:370px){h1{font-size:32px}}
+</style><script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script></head>
+<body><header><strong>DRIFTER</strong><span>MEMBER ACCESS</span></header><main>
+<div class="eyebrow">YOUR BODY. YOUR HISTORY.</div>
+<h1>BODY PASSPORT<small>我的身體護照</small></h1>
+<p>瀏覽每次預約前的身體狀況，以及工作室核准分享的施作摘要和恢復建議。</p>
+<div class="art"><span>DRIFTER / PERSONAL RECORD</span><h2>每一次恢復，<br>都有紀錄。</h2><span>PRIVATE · MEMBER ONLY</span></div>
+<div class="panel" aria-live="polite"><div id="status" class="status">正在確認會員入口…</div><p id="detail">請從 DRIFTER LINE 官方帳號開啟。</p></div>
+<form id="portalForm" method="POST" action="https://script.google.com/macros/s/AKfycbwVJ_6J2b54Jmy8o8rdvSVtXREyNbiGfKVHtyAPD0qoSYJnfPT8JOY0_WwHSZeQQMUZmA/exec">
+<input type="hidden" name="action" value="memberPassportView"><input type="hidden" name="id_token" id="token">
+<button type="submit" class="submit" id="open" disabled>查看我的 Body Passport</button></form>
+<p class="foot">本入口僅供已完成身份核對的會員本人使用。工作室內部備註、審閱資料及財務紀錄不會公開。</p>
+</main><script>
+(function(){'use strict';
+const LIFF='2011856045-PfCKIOb3',GAS='https://script.google.com/macros/s/AKfycbwVJ_6J2b54Jmy8o8rdvSVtXREyNbiGfKVHtyAPD0qoSYJnfPT8JOY0_WwHSZeQQMUZmA/exec';
+const status=document.getElementById('status'),detail=document.getElementById('detail'),token=document.getElementById('token'),button=document.getElementById('open');
+function say(a,b){status.textContent=a;detail.textContent=b}
+function health(){return new Promise(resolve=>{
+const cb='drifterMemberVersion_'+Math.random().toString(36).slice(2);
+const script=document.createElement('script');let finished=false;
+const timeout=setTimeout(()=>finish(false),9000);
+function finish(ok){if(finished)return;finished=true;clearTimeout(timeout);delete window[cb];script.remove();resolve(ok)}
+window[cb]=r=>finish(!!(r&&r.ok&&r.memberViewVersion==='MP-READ-2026-10'));
+script.onerror=()=>finish(false);
+script.src=GAS+'?action=health&callback='+encodeURIComponent(cb)+'&v=20261029';document.head.appendChild(script)
+})}
+async function init(){
+try{
+if(!(await health())){say('會員查閱入口尚未啟用','工作室正在完成會員身份授權與安全串接；目前預約與主訴填寫均不受影響。');return}
+if(typeof liff==='undefined')throw Error('LINE SDK 未載入');
+await liff.init({liffId:LIFF});
+if(!liff.isLoggedIn()){say('需要 LINE 登入','將導向 LINE 驗證身份。');liff.login({redirectUri:location.href});return}
+const idToken=liff.getIDToken();if(!idToken)throw Error('沒有登入驗證資料');
+token.value=idToken;button.disabled=false;
+say('身份驗證已準備完成','點擊下方按鈕，伺服器會確認帳號是否已經由 DRIFTER 核准開通。')
+}catch(err){console.warn('Member portal initialization failed',err);
+say('暫時無法驗證登入','請從 DRIFTER LINE 官方帳號重新開啟，或聯絡工作室。')}}
+document.getElementById('portalForm').addEventListener('submit',e=>{if(button.disabled||!token.value){e.preventDefault();return}button.disabled=true;button.textContent='正在安全讀取…'});
+init()
+})();
+</script></body></html>
