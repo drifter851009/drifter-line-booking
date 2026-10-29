@@ -43,10 +43,11 @@ script.src=GAS+'?action=health&callback='+encodeURIComponent(cb)+'&v=20261029';d
 })}
 async function init(){
 try{
-const key=new URL(location.href).searchParams.get('ticket')||'';if(!/^[0-9a-f]{64}$/i.test(key)){say('綁定連結無效','請重新掃描工作室提供的 QR Code。');return}ticket.value=key;
 if(!(await health())){say('綁定入口尚未啟用','工作室尚未完成 GAS 會員綁定版本部署。');return}
 if(typeof liff==='undefined')throw Error('LINE SDK 未載入');
 await liff.init({liffId:LIFF});
+// LINE 可能先以 liff.state 保留參數；必須在 liff.init() 之後讀取。
+const key=new URL(location.href).searchParams.get('ticket')||'';if(!/^[0-9a-f]{64}$/i.test(key)){say('綁定連結無效','請重新掃描工作室提供的 QR Code。');return}ticket.value=key;
 if(!liff.isLoggedIn()){say('需要 LINE 登入','將導向 LINE 驗證身份。');liff.login({redirectUri:location.href});return}
 const idToken=liff.getIDToken();if(!idToken)throw Error('沒有登入驗證資料');
 token.value=idToken;button.disabled=false;
