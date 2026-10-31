@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#171717">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="referrer" content="no-referrer">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; form-action 'none'; connect-src 'none'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'self' 'unsafe-inline' https://static.line-scdn.net; img-src 'self' data: https://*.line-scdn.net; frame-src https://*.line.me; form-action 'none'; connect-src https://*.line.me https://*.line-scdn.net https://*.line-apps.com https://api.line.me; base-uri 'none'">
 <title>DRIFTER｜Body Passport｜電子契約開發預覽</title>
 <style>
 :root{color-scheme:light;--ink:#1c1b19;--quiet:#635e57;--gold:#b7956c;--cream:#f5f2ec;--paper:#fffefa;--edge:#ded6cb;--black:#171717}
@@ -53,6 +53,8 @@ button:hover{background:#443728}button:focus-visible,input:focus-visible{outline
 footer{font-size:12px;color:#766e63;text-align:center;margin-top:30px}
 @media(max-width:560px){main{padding:22px 14px 60px}.section{padding:18px 15px}.plan-grid{grid-template-columns:1fr}.steps{gap:4px}.step{font-size:10px;padding:9px 3px}.kicker{font-size:9px}header{padding:14px 16px}}
 </style>
+<script defer src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+<script defer src="./member-contract-liff-preview.js"></script>
 </head>
 <body>
 <header><div class="logo">DRIFTER</div><div class="kicker">BODY PASSPORT<br>MEMBER AGREEMENT · PREVIEW</div></header>
@@ -66,6 +68,18 @@ footer{font-size:12px;color:#766e63;text-align:center;margin-top:30px}
 <div class="step"><small>STEP 03</small>簽署驗證</div>
 <div class="step"><small>STEP 04</small>付款後開通</div>
 </div>
+<section class="section" aria-labelledby="auth-title">
+<div class="num">00 / LINE IDENTITY · DEVELOPMENT</div><h2 id="auth-title">LINE 登入與會員身分驗證</h2>
+<p class="detail">正式版會先確認 LINE 登入，再由 GAS 向 LINE 核驗登入憑證，並以既有綁定資料判斷是否有本人待簽署契約。下方只提供前端登入準備檢查。</p>
+<div class="not-live" aria-live="polite">
+<strong id="lineAuthStatus">開發預覽：LINE 登入尚未啟用</strong>
+<p id="lineAuthDetail" style="margin:7px 0 0;font-size:12px;color:#685c4d">LINE 登入後仍須完成後端驗證，不會直接取得簽署權限。</p>
+</div>
+<div class="actions">
+<button type="button" class="btn-secondary" id="lineAuthCheck" disabled>檢查 LINE 登入（開發測試）</button>
+</div>
+<p class="legal-note">此檢查不傳送或儲存 ID Token，不以瀏覽器提供的會員編號作為驗證依據，也不會建立契約。</p>
+</section>
 <section class="section" aria-labelledby="choose-title">
 <div class="num">01 / PLAN REVIEW</div><h2 id="choose-title">確認會員方案</h2>
 <div class="plan-grid" role="radiogroup" aria-label="會員方案">
@@ -135,7 +149,7 @@ footer{font-size:12px;color:#766e63;text-align:center;margin-top:30px}
 <button type="button" id="check">檢查勾選完成度（示範）</button>
 <button type="button" class="btn-secondary" id="reset">清除示範勾選</button>
 </div>
-<div id="status" class="status" role="status" aria-live="polite">本頁沒有連接 LINE、GAS、Google Sheets、付款或會員開通系統。</div>
+<div id="status" class="status" role="status" aria-live="polite">開發版僅提供 LINE 登入準備檢查；尚未連接 GAS 會員核驗、付款或會員開通。</div>
 <div class="not-live"><strong>正式簽署功能尚未啟用</strong><br>這個開發版本不保存資料、不產生法律效力、不發出簽約通知，也不會變更任何會員堂數。正式版須先完成身分驗證、契約法規審核、後端安全控管與全流程測試。</div>
 </section>
 <footer>DRIFTER SPORTS MASSAGE STUDIO · BODY PASSPORT · DEVELOPMENT PREVIEW</footer>
@@ -158,7 +172,7 @@ document.getElementById('summaryPrice').textContent=item.price;
 document.getElementById('count').textContent=item.count;
 document.getElementById('unit').textContent=item.unit;
 document.getElementById('months').textContent=item.months;
-status.textContent='本頁沒有連接 LINE、GAS、Google Sheets、付款或會員開通系統。';
+status.textContent='開發版僅提供 LINE 登入準備檢查；尚未連接 GAS 會員核驗、付款或會員開通。';
 status.className='status';
 }
 radios.forEach(function(r){r.addEventListener('change',update)});
