@@ -70,6 +70,11 @@ ol{margin:12px 0 0;padding-left:19px;color:#625e57;font-size:13px;line-height:2.
 <div class="label">AFTER SIGNING / MEMBER ACCESS</div>
 <h2>已完成簽署？</h2>
 <p class="panel-note">本頁僅查詢尚待簽署的契約。已簽署的契約不會再次顯示在待簽清單；如需查閱簽署副本，請向 DRIFTER LINE 官方帳號申請。正式會員紀錄請由下方獨立入口查閱，系統會再次驗證本人 LINE 身分及查閱權限。</p>
+<form id="archiveForm" action="https://script.google.com/macros/s/AKfycbwVJ_6J2b54Jmy8o8rdvSVtXREyNbiGfKVHtyAPD0qoSYJnfPT8JOY0_WwHSZeQQMUZmA/exec" method="POST" autocomplete="off">
+<input type="hidden" name="action" value="memberContractArchive">
+<input type="hidden" name="id_token" id="archiveIdToken">
+<button id="archive" type="submit" disabled>查閱我的已簽署契約</button>
+</form>
 <a class="portal-link" href="./member-passport.html">前往我的 Body Passport</a>
 </section>
 <section class="panel">
@@ -91,6 +96,8 @@ var GAS='https://script.google.com/macros/s/AKfycbwVJ_6J2b54Jmy8o8rdvSVtXREyNbiG
 var status=document.getElementById('status');
 var detail=document.getElementById('detail');
 var token=document.getElementById('idToken');
+var archiveToken=document.getElementById('archiveIdToken');
+var archiveButton=document.getElementById('archive');
 var button=document.getElementById('open');
 var ready=false;
 function say(a,b){status.textContent=a;detail.textContent=b;}
@@ -120,13 +127,17 @@ return;
 }
 var idToken=liff.getIDToken();
 if(!idToken)throw Error('未取得 LINE 身分驗證資料');
-token.value=idToken;ready=true;button.disabled=false;
+token.value=idToken;archiveToken.value=idToken;ready=true;button.disabled=false;archiveButton.disabled=false;
 say('已準備確認本人契約','點擊下方按鈕後，伺服器將再次核對 LINE 身分、已綁定會員及該會員的待簽契約。');
 }catch(err){console.warn('Contract portal failed',err);say('目前無法驗證身分','請由 DRIFTER LINE 官方帳號重新開啟，或聯絡工作室。');}
 }
 document.getElementById('contractForm').addEventListener('submit',function(e){
 if(!ready||button.disabled||!token.value){e.preventDefault();return;}
 ready=false;button.disabled=true;button.textContent='正在安全讀取…';
+});
+document.getElementById('archiveForm').addEventListener('submit',function(e){
+if(!ready||archiveButton.disabled||!archiveToken.value){e.preventDefault();return;}
+archiveButton.disabled=true;archiveButton.textContent='正在安全讀取…';
 });
 init();
 })();
