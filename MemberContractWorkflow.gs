@@ -405,11 +405,74 @@ function drifterMc27Sign_(p){
     '<h3>契約內容副本</h3><pre>'+drifterMc27Escape_(result.snapshot)+'</pre>'+
     '<p class="muted">可使用瀏覽器「列印／儲存為 PDF」保存此頁。</p>');
 }
+/**
+ * 2027 會員本人已簽署契約唯讀查詢。
+ * 僅接受既有 doPost 以 POST 轉入的 LINE ID Token，不接受會員編號或 URL 查詢參數。
+ * 簽署紀錄、契約雜湊與會員歸屬全部在伺服器重新核驗。
+ */
+function drifterMc27Archive_(p){
+  var ss=drifterMc27SS_();
+  var verified=drifterMc27MemberFromToken_(ss,p.id_token);
+  var memberId=verified.member['會員編號'];
+  var ct=drifterMc27Table_(ss,DRIFTER_MC27.sheetContracts);
+  var st=drifterMc27Table_(ss,DRIFTER_MC27.sheetSignatures);
+  var all=drifterMc27Objects_(ct);
+  var sigs=drifterMc27Objects_(st);
+  var contracts=all.filter(function(c){
+    return c['會員編號']===memberId &&
+      (c['契約狀態']==='已簽署'||c['契約狀態']==='已生效') &&
+      !!c['簽署完成UTC'];
+  });
+  if(contracts.length===0){
+    return drifterMc27Page_('<h2>目前尚無已簽署契約</h2>'+
+      '<p>此頁僅顯示你本人已完成電子簽署的契約。尚未核發、尚待簽署或已撤銷的申請不會顯示。</p>');
+  }
+  contracts.sort(function(a,b){
+    return Date.parse(b['簽署完成UTC'])-Date.parse(a['簽署完成UTC']);
+  });
+  var sections=contracts.map(function(c){
+    var cid=String(c['契約編號']||'');
+    if(!cid||all.filter(function(x){return x['契約編號']===cid;}).length!==1)
+      throw Error('契約編號異常，請聯絡工作室');
+    var matches=sigs.filter(function(x){
+      return x['契約編號']===cid&&x['簽署結果']==='完成';
+    });
+    if(matches.length!==1||
+      matches[0]['會員編號']!==memberId||
+      matches[0]['契約版本']!==c['契約版本']||
+      matches[0]['契約文件SHA256']!==c['契約文件SHA256']||
+      matches[0]['簽署完成UTC']!==c['簽署完成UTC'])
+      throw Error('電子簽署紀錄不一致，請聯絡工作室');
+    if(!Number.isFinite(Date.parse(c['簽署完成UTC'])))
+      throw Error('簽署時間無效，請聯絡工作室');
+    var snapshot=drifterMc27StoredSnapshot_(c);
+    var isTest=/系統驗收測試|無實際收款/.test(String(c['付款方式']||''));
+    var testNote=isTest?'<p class="warn">此筆為系統驗收測試，沒有實際收款。</p>':'';
+    return '<section style="border-top:1px solid #ddd;padding-top:18px;margin-top:22px">'+
+      '<h2>契約：'+drifterMc27Escape_(cid)+'</h2>'+
+      '<p>方案：'+drifterMc27Escape_(c['方案名稱'])+'</p>'+
+      '<p>簽署時間（UTC）：'+drifterMc27Escape_(c['簽署完成UTC'])+'</p>'+
+      '<p>契約狀態：'+drifterMc27Escape_(c['契約狀態'])+
+      '；付款狀態：'+drifterMc27Escape_(c['付款狀態']||'未確認')+'</p>'+
+      testNote+
+      '<p class="muted">契約文件 SHA-256：'+drifterMc27Escape_(c['契約文件SHA256'])+'</p>'+
+      '<details><summary>閱讀已簽署契約全文</summary><pre>'+
+      drifterMc27Escape_(snapshot)+'</pre></details></section>';
+  }).join('');
+  return drifterMc27Page_(
+    '<h2>我的已簽署契約</h2>'+
+    '<p>已透過 LINE 驗證本人身分。下方內容僅由伺服器載入與本人會員編號關聯、且有完整簽署紀錄的契約。</p>'+
+    sections+
+    '<p class="muted">可使用瀏覽器列印／儲存為 PDF 保存這份唯讀查詢結果。若有資料不符，請聯絡工作室。</p>'
+  );
+}
+
 function drifterMc27HandlePost_(e){
   try{
     drifterMc27RequireEnabled_();
     var p=(e&&e.parameter)||{};
     if(p.action==='memberContractOpen')return drifterMc27Review_(p);
+    if(p.action==='memberContractArchive')return drifterMc27Archive_(p);
     if(p.action==='memberContractSign')return drifterMc27Sign_(p);
     return drifterMc27Error_('不支援的契約操作');
   }catch(err){
