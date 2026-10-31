@@ -72,9 +72,31 @@ function drifterMemberContractPendingPreflight(){
   if(DRIFTER_MCP_LOOKUP.allowedVersions.length)throw Error('開發階段不得啟用正式簽署');
   return '待簽契約預檢通過；正式簽署尚未啟用。';
 }
-/** Integration remains disabled until verified membership is connected. */
-function drifterMcpLookupForVerifiedMember_(){
-  throw Error('會員身分及契約授權尚未完成正式串接');
+/**
+ * 後端內部使用：身分驗證後查詢本人唯一的待簽契約。
+ * 發佈前務必審查既有 verifyLineIdToken_；不提供直接 HTTP 路由。
+ * 未核准任何正式契約版本時，一律拒絕、且不讀取會員資料。
+ */
+function drifterMcpLookupForVerifiedMember_(rawIdToken){
+  var versions=DRIFTER_MCP_LOOKUP.allowedVersions;
+  if(!Array.isArray(versions)||versions.length===0){
+    throw Error('正式契約版本尚未核准，查詢入口保持關閉');
+  }
+  if(typeof drifterMc2027ResolveBoundMember_!=='function'){
+    throw Error('會員身分驗證模組未就緒');
+  }
+  var identity=drifterMc2027ResolveBoundMember_(rawIdToken);
+  var memberId=String(identity&&identity.memberId||'').trim();
+  if(!memberId)throw Error('會員身份核驗未通過');
+  var ss=SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
+  var contracts=drifterMcpLookupTable_(ss,DRIFTER_MCP_LOOKUP.contractSheet,
+    ['契約編號','會員編號','方案名稱','實付金額','付費堂數','贈送堂數',
+     '總堂數','方案效期月數','契約版本','契約文件SHA256','簽約申請ID',
+     '契約狀態','簽署期限UTC','簽署完成UTC']);
+  var requests=drifterMcpLookupTable_(ss,DRIFTER_MCP_LOOKUP.requestSheet,
+    ['核發申請ID','會員編號','方案代碼','處理狀態','契約編號',
+     '契約版本','簽署期限UTC']);
+  return drifterMcpLookupCheck_(memberId,contracts,requests,versions,Date.now());
 }
 function drifterMemberContractPendingSelfTest(){
   var version='TEST-ONLY',expiry='2027-01-03T00:00:00.000Z';
@@ -91,5 +113,24 @@ function drifterMemberContractPendingSelfTest(){
   var rejected=false;
   try{drifterMcpLookupCheck_('M-TEST',[c],[r],[],t)}catch(_){rejected=true}
   if(!rejected)throw Error('契約版本拒絕測試失敗');
-  return '合成資料測試通過；沒有讀取或寫入真實會員紀錄。';
+  function shouldReject_(label,cc,rr,vs,at){
+    var denied=false;
+    try{drifterMcpLookupCheck_('M-TEST',cc,rr,vs,at||t)}catch(_){denied=true}
+    if(!denied)throw Error(label+' 未被拒絕');
+  }
+  shouldReject_('重複待簽契約',[c,c],[r],[version]);
+  shouldReject_('期限已過',[c],[r],[version],Date.parse('2027-01-04T00:00:00.000Z'));
+  var invalidHash=Object.assign({},c,{'契約文件SHA256':'invalid'});
+  shouldReject_('雜湊不完整',[invalidHash],[r],[version]);
+  var signed=Object.assign({},c,{'簽署完成UTC':'2027-01-01T00:00:00.000Z'});
+  shouldReject_('已簽署契約',[signed],[r],[version]);
+  var otherMember=Object.assign({},r,{'會員編號':'OTHER'});
+  shouldReject_('申請會員不一致',[c],[otherMember],[version]);
+  var wrongPrice=Object.assign({},c,{'實付金額':'1'});
+  shouldReject_('方案金額不一致',[wrongPrice],[r],[version]);
+  var notIssued=Object.assign({},r,{'處理狀態':'待核發'});
+  shouldReject_('尚未核發',[c],[notIssued],[version]);
+  var anotherContract=Object.assign({},r,{'契約編號':'C-OTHER'});
+  shouldReject_('契約與申請不一致',[c],[anotherContract],[version]);
+  return '合成資料測試通過：正例、跨會員、未核准版本及8項拒絕案例；未存取真實資料。';
 }
