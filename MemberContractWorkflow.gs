@@ -13,9 +13,11 @@
  * 這是正式開發中的啟用門檻，不是另一套測試系統。
  */
 const DRIFTER_MC27 = {
-  enabled: false,
-  approvedVersion: '',
-  approvedText: '',
+  enabled: true,
+  approvedVersion: 'DRIFTER-MEMBER-2027-V1.2',
+  approvedText: "DRIFTER 運動按摩工作室\n\n2027 會員堂數方案購買暨服務使用契約\n\n第一條｜契約當事人\n\n甲方（會員）\n\n* 會員姓名：＿＿＿＿＿＿\n* 會員編號：＿＿＿＿＿＿\n* 聯絡電話：＿＿＿＿＿＿\n\n乙方（服務提供者）\n\n* 工作室：DRIFTER 運動按摩工作室\n* 實際契約主體／負責人：＿＿＿＿＿＿\n* 服務地址：新竹市東大路二段156號8樓\n* 客服聯絡方式：＿＿＿＿＿＿\n\n契約編號、契約審閱提供日期、簽署日期及時間由系統記錄。\n\n第二條｜會員方案\n\n甲方選擇以下其中一項方案：\n\nA．基礎保養方案\n\n* 實付金額：NT$15,000\n* 付費堂數：10 堂\n* 贈送堂數：2 堂\n* 合計可使用：12 堂\n* 每堂平均計算價值：NT$1,250\n* 使用期限：18 個月\n\nB．進階保養方案\n\n* 實付金額：NT$25,000\n* 付費堂數：20 堂\n* 贈送堂數：5 堂\n* 合計可使用：25 堂\n* 每堂平均計算價值：NT$1,000\n* 使用期限：24 個月\n\n訂單應明確顯示方案名稱、實付金額、生效日期及到期日期。\n\n第三條｜服務內容與施作方式\n\n1. 乙方提供運動按摩、運動後恢復及日常疲勞恢復相關服務。\n2. 每次基礎預約服務時間為60分鐘。\n3. 施作前由服務人員依會員當日身體狀況及需求進行確認與評估。\n4. 服務可能包含徒手按摩、筋膜刀放鬆及適當伸展等方式，實際採用項目依適用性及會員同意決定。\n5. 是否延長服務時間由服務人員現場評估。\n6. 一般加時以30分鐘為單位，每30分鐘NT$600；單次最長實際服務時間為120分鐘。\n7. 符合會員免費加時資格者，依購買時已揭露的有效會員規則辦理。\n8. 本服務不屬醫療診斷或治療，服務人員得基於安全考量調整施作方式。\n\n第四條｜堂數使用與扣除\n\n1. 每完成一次符合方案約定的基本服務，原則上扣除1堂。\n2. 服務完成及會員確認後，系統始依約定核銷堂數。\n3. 付費堂數與贈送堂數合併計入可使用總堂數。\n4. 每次實際使用的堂數均自總剩餘堂數中扣除。\n5. 會員可透過指定管道查詢剩餘堂數、服務日期與核銷紀錄。\n6. 不得以會員尚未使用完付費堂數為由，將已約定的贈送堂數排除於退費價值計算之外；實際退費仍依適用法令辦理。\n\n第五條｜會員方案使用期限\n\n1. 基礎保養方案期限為18個月。\n2. 進階保養方案期限為24個月。\n3. 使用期限原則上自完成付款且方案成立之日開始計算。\n4. 確切生效日期及到期日期應在簽署前顯示。\n5. 會員應於契約有效期間內預約使用服務。\n6. 遇有依法應暫停、展延、終止或退費的情形，應依適用法規及有效約定辦理。\n\n第六條｜退費計算方式與契約終止\n\n一、剩餘服務價值\n\n方案每堂平均價值＝實際支付之方案總金額 ÷ 約定總服務堂數（包括贈送堂數）。\n\n剩餘服務堂數＝約定總服務堂數－實際已使用堂數。\n\n剩餘服務價值＝剩餘服務堂數 × 每堂平均價值。\n\n剩餘堂數不得小於零，贈送堂數不得重複計價或重複扣除。\n\n二、工作室擬定的一般退費級距\n\n會員提出一般契約終止申請時，工作室擬採以下方式計算：\n\n* 購買成立後1個月內：剩餘服務價值 × 80%。\n* 超過1個月至滿3個月：剩餘服務價值 × 50%。\n* 超過3個月至滿6個月：剩餘服務價值 × 50%。\n* 超過6個月：原則上不予退費。\n\n期間按方案成立日期及相應曆月日期判定，系統應記錄申請日期與所適用的退費條件。\n\n三、申請與退款期限\n\n1. 會員可透過工作室指定管道提出契約終止及退費申請。\n2. 工作室應記錄申請日期、已使用堂數、剩餘服務價值及退費明細。\n3. 工作室擬於收到完整退費申請後3個月內完成退款；如適用法律規定較短期限，應依較短期限辦理。\n4. 若係工作室無法履行、違約或依法不得限制消費者終止及退費的情形，不得僅依前述級距拒絕辦理。\n\n四、法律適用\n\n本條所載80%、50%、超過6個月不予退費及退款期限，係工作室提出的制度規劃。正式上線前須依實際適用業別完成契約條款審核，與強制性法令牴觸者，以法令及依法修訂的正式版本為準。\n\n第七條｜預約及異動規範\n\n1. 會員應透過工作室指定管道預約。\n2. 預約日期及時間以正式確認紀錄為準。\n3. 取消、修改及遲到依已公告且合法有效的預約規範辦理。\n4. 會員送出預約異動申請，不代表原預約立即取消或修改；須經工作室確認。\n5. 因工作室原因無法提供原定服務時，應依法提供適當處理方式。\n\n第八條｜新舊會員制度\n\n1. 本契約原則上適用2027年新成立的會員方案。\n2. 2027年前購買的方案，應依原契約及適用法規辦理。\n3. 工作室規劃以2027至2028年作為既有會員方案的過渡整理期間。\n4. 涉及既有堂數、使用期限或退費權益變更時，應完成必要的個別協商及同意程序。\n5. 工作室不得僅因新制上線而單方取消會員依法享有的預付服務權益。\n\n第九條｜電子契約及簽署\n\n1. 工作室於簽署前提供完整契約內容及依法應有的審閱期間。\n2. 會員可透過指定的LINE電子契約頁面審閱與確認條款。\n3. 會員應先確認本人身分、購買方案、金額、總堂數、期限及退費計算說明。\n4. 會員透過明確的勾選及確認程序完成電子簽署。\n5. 系統應保存契約版本、完整條款內容、同意紀錄、簽署時間與簽署身分驗證資訊。\n6. 已簽署契約不得因後續更新條款而遭覆蓋。\n7. 工作室應提供會員可保存及日後查驗的電子契約副本。\n8. 如依法需提供非電子形式或會員依法得停止採用電子形式，應提供適當方式辦理。\n\n第十條｜個人資料及服務紀錄\n\n1. 工作室為會員管理、預約、堂數使用、履約及依法保存紀錄之必要目的處理個人資料。\n2. 個人資料蒐集事項另行依法告知。\n3. 身體評估及健康相關資料採取必要的存取限制與安全措施。\n4. 行銷訊息接收同意應獨立提供，不得預設勾選。\n\n第十一條｜其他約定\n\n1. 契約內容以雙方簽署時的有效版本及購買明細為準。\n2. 方案成立後，乙方不得單方不利變更會員已取得的主要權益。\n3. 未盡事項依中華民國適用法令辦理。\n4. 如有爭議，雙方得協商、調解或依法尋求救濟。\n\n⸻\n\n會員電子簽署確認\n\n下列項目均應由會員自行勾選，不得預先勾選：\n\n* [ ]    我已審閱完整契約，並已獲提供依法應有的審閱期間。\n* [ ]    我已確認購買方案、實付金額及付費與贈送總堂數。\n* [ ]    我已確認契約生效日、到期日與方案使用期限。\n* [ ]    我已閱讀服務內容、預約及堂數扣除規則。\n* [ ]    我已閱讀包含贈送堂數在內的退費計算方式、退費條件及申請程序。\n* [ ]    我同意使用電子形式簽署，並知悉取得契約副本的方式。\n* [ ]    我已閱讀個人資料蒐集告知事項。\n\n會員姓名：＿＿＿＿＿＿\n\n購買方案：＿＿＿＿＿＿\n\n實付金額：＿＿＿＿＿＿\n\n總服務堂數：＿＿＿＿＿＿\n\n有效期限：＿＿＿＿＿＿\n\n契約編號： 系統自動產生\n\n簽署時間： 系統自動記錄\n\n契約版本： DRIFTER-MEMBER-2027-V1.2\n\n【確認簽署並送出】\n",
+  sellerLegalEntity: '',
+  customerService: 'DRIFTER LINE 官方帳號 @866obeca',
   lineChannelId: '2011856045',
   liffUrl: 'https://liff.line.me/2011856045-PfCKIOb3/member-contract.html',
   qrUrl: 'https://drifter851009.github.io/drifter-line-booking/staff-contract-qr.html',
@@ -107,24 +109,44 @@ function drifterMc27Member_(ss,memberId){
   return m;
 }
 function drifterMc27Snapshot_(c,m){
-  var lines=[
-    'DRIFTER 運動按摩工作室｜會員方案電子契約',
-    '契約版本：'+c['契約版本'],
-    '契約編號：'+c['契約編號'],
-    '會員編號：'+c['會員編號'],
-    '會員姓名：'+m['姓名'],
-    '契約類型：'+c['契約類型'],
-    '方案名稱：'+c['方案名稱'],
-    '實付金額（新台幣）：'+c['實付金額'],
-    '付費堂數：'+c['付費堂數'],
-    '贈送堂數：'+c['贈送堂數'],
-    '總服務堂數：'+c['總堂數'],
-    '方案效期（月）：'+c['方案效期月數'],
-    '生效日：依正式條款與付款確認結果認定',
-    '正式審定契約全文：',
-    DRIFTER_MC27.approvedText
-  ];
-  return lines.join('\n');
+  var t=DRIFTER_MC27.approvedText;
+  function put(from,to){if(t.indexOf(from)<0)throw Error('契約欄位不存在：'+from);t=t.replace(from,String(to));}
+  put('* 會員姓名：＿＿＿＿＿＿','* 會員姓名：'+m['姓名']);
+  put('* 會員編號：＿＿＿＿＿＿','* 會員編號：'+m['會員編號']);
+  put('* 聯絡電話：＿＿＿＿＿＿','* 聯絡電話：'+(m['手機']||'未提供'));
+  put('* 實際契約主體／負責人：＿＿＿＿＿＿','* 實際契約主體／負責人：'+DRIFTER_MC27.sellerLegalEntity);
+  put('* 客服聯絡方式：＿＿＿＿＿＿','* 客服聯絡方式：'+DRIFTER_MC27.customerService);
+  put('\n會員姓名：＿＿＿＿＿＿','\n會員姓名：'+m['姓名']);
+  put('\n購買方案：＿＿＿＿＿＿','\n購買方案：'+c['方案名稱']);
+  put('\n實付金額：＿＿＿＿＿＿','\n實付金額：NT$'+Number(c['實付金額']).toLocaleString('en-US'));
+  put('\n總服務堂數：＿＿＿＿＿＿','\n總服務堂數：'+c['總堂數']+' 堂');
+  put('\n有效期限：＿＿＿＿＿＿','\n有效期限：'+c['方案效期月數']+' 個月（付款確認日開始起算）');
+  put('契約編號： 系統自動產生','契約編號：'+c['契約編號']);
+  put('簽署時間： 系統自動記錄','簽署時間：本人確認簽署時由系統自動記錄');
+  var info=['本次會員專屬交易資料（系統自動帶入）',
+    '契約編號：'+c['契約編號'],'契約類型：'+c['契約類型'],
+    '會員編號：'+c['會員編號'],'會員姓名：'+m['姓名'],
+    '電話：'+(m['手機']||'未提供'),'方案：'+c['方案名稱'],
+    '總金額：NT$'+Number(c['實付金額']).toLocaleString('en-US'),
+    '付費堂數：'+c['付費堂數'],'贈送堂數：'+c['贈送堂數'],
+    '總堂數：'+c['總堂數'],'每堂平均價值：NT$'+c['每堂平均價值'],
+    '使用期限：'+c['方案效期月數']+' 個月',
+    '核發/審閱提供 UTC：'+c['建立UTC'],
+    '簽署截止 UTC：'+c['簽署期限UTC'],
+    '生效日及到期日：將於工作室確認付款後自動依約定日期計算；未付款前無法確定'];
+  return t.trimEnd()+'\n\n'+info.join('\n')+'\n';
+}
+function drifterMc27StoreSnapshot_(c,m){
+  var content=drifterMc27Snapshot_(c,m);
+  var file=DriveApp.createFile('DRIFTER-'+c['契約編號']+'-issued.txt',content,MimeType.PLAIN_TEXT);
+  return {content:content,id:file.getId()};
+}
+function drifterMc27StoredSnapshot_(c){
+  var found=/^MC27_SNAPSHOT_FILE_ID=([A-Za-z0-9_-]{20,200})$/.exec(String(c['備註']||''));
+  if(!found)throw Error('契約核發全文快照不存在');
+  var text=DriveApp.getFileById(found[1]).getBlob().getDataAsString('UTF-8');
+  if(drifterMc27Hex_(text)!==c['契約文件SHA256'])throw Error('契約快照校驗失敗');
+  return text;
 }
 function drifterMc27ValidateContract_(ss,c,m,reqs){
   if(!c||c['會員編號']!==m['會員編號'])throw Error('無法取得本人契約');
@@ -143,7 +165,7 @@ function drifterMc27ValidateContract_(ss,c,m,reqs){
     if(Number(String(c[cols[i]]).replace(/,/g,''))!==v)throw Error('契約方案金額或堂數不符');
   });
   if(c['方案名稱']!==p.name)throw Error('契約方案名稱不符');
-  var snapshot=drifterMc27Snapshot_(c,m);
+  var snapshot=drifterMc27StoredSnapshot_(c);
   if(drifterMc27Hex_(snapshot)!==c['契約文件SHA256'])throw Error('契約原文完整性驗證失敗');
   return {contract:c,request:r,plan:p,snapshot:snapshot};
 }
@@ -236,7 +258,10 @@ function drifterMc27IssueFromAppSheet(requestId){
       '付款狀態':'待付款','核發人員':r['核發申請人'],
       '建立UTC':created,'更新UTC':created
     };
-    c['契約文件SHA256']=drifterMc27Hex_(drifterMc27Snapshot_(c,m));
+    if(!String(DRIFTER_MC27.sellerLegalEntity||'').trim())throw Error('尚未設定實際契約主體／負責人');
+    var archived=drifterMc27StoreSnapshot_(c,m);
+    c['契約文件SHA256']=drifterMc27Hex_(archived.content);
+    c['備註']='MC27_SNAPSHOT_FILE_ID='+archived.id;
     ct.sheet.appendRow(drifterMc27Row_(ct,c));
     drifterMc27Set_(rt,r._row,{
       '處理狀態':'已核發','契約編號':id,
@@ -408,7 +433,7 @@ function drifterMc27ActivateFromPayment(contractId){
       if(Number(String(contract[k]||'').replace(/[,，]/g,''))!==numeric[k])
         throw Error('契約方案數值不一致：'+k);
     });
-    if(drifterMc27Hex_(drifterMc27Snapshot_(contract,m))!==contract['契約文件SHA256'])
+    if(drifterMc27Hex_(drifterMc27StoredSnapshot_(contract))!==contract['契約文件SHA256'])
       throw Error('契約文件雜湊不一致');
     if(contract['付款狀態']!=='已確認'||!contract['付款確認UTC']||
       !Number.isFinite(Date.parse(contract['付款確認UTC']))||!contract['付款方式'])
