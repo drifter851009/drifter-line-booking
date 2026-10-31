@@ -26,6 +26,7 @@ const DRIFTER_MC27 = {
   sheetSignatures: '會員電子簽署紀錄',
   sheetActivation: '會員方案開通紀錄',
   sheetPackages: '堂數方案',
+  sheetMovements: '堂數異動紀錄',
   timezone: 'Asia/Taipei',
   plan: {
     BASIC_10_2_2027: {name:'基礎保養｜10+2 堂',price:15000,paid:10,bonus:2,total:12,months:18},
@@ -423,6 +424,46 @@ function drifterMc27HandlePost_(e){
  * 不提供 doGet/doPost 公開操作；由 AppSheet 付款確認 Bot 呼叫。
  * 依賴 MemberContractWorkflow.gs 的 DRIFTER_MC27 與 drifterMc27* 工具函式。
  */
+/**
+ * 2027 契約開通時補齊堂數帳本的「購買」起始異動。
+ * AppSheet 既有扣堂從帳本加減總和計算餘額，不能只建立堂數方案主檔。
+ * 以同一方案的購買異動為防重條件，重試不會重複增加堂數。
+ */
+function drifterMc27EnsureOpeningMovement_(ss,packageId,memberId,total,start,operator){
+  var mt=drifterMc27Table_(ss,DRIFTER_MC27.sheetMovements);
+  drifterMc27RequireColumns_(mt,[
+    '異動編號','方案編號','會員編號','異動日期','異動類型',
+    '堂數增減','異動後餘額','操作人員','備註','建立時間'
+  ]);
+  var rows=drifterMc27Objects_(mt).filter(function(r){
+    return r['方案編號']===packageId&&r['異動類型']==='購買';
+  });
+  if(rows.length>1)throw Error('方案購買起始異動重複，禁止重複加堂');
+  if(rows.length===1){
+    if(rows[0]['會員編號']!==memberId||
+       Number(String(rows[0]['堂數增減']).replace(/,/g,''))!==total)
+      throw Error('既有購買起始異動數值與會員不一致');
+    return rows[0]['異動編號'];
+  }
+  var movementId='MC27O'+drifterMc27Hex_(packageId).slice(0,12);
+  var collision=drifterMc27One_(drifterMc27Objects_(mt),'異動編號',movementId);
+  if(collision)throw Error('堂數帳本異動編號衝突');
+  var dateTime=Utilities.formatDate(new Date(),DRIFTER_MC27.timezone,'yyyy-MM-dd HH:mm:ss');
+  var movement={
+    '異動編號':movementId,
+    '方案編號':packageId,
+    '會員編號':memberId,
+    '異動日期':start,
+    '異動類型':'購買',
+    '堂數增減':total,
+    '異動後餘額':total,
+    '操作人員':operator||'2027契約自動開通',
+    '備註':'2027電子契約起始堂數／方案權益入帳（不代表新增收款）',
+    '建立時間':dateTime
+  };
+  mt.sheet.appendRow(drifterMc27Row_(mt,movement));
+  return movementId;
+}
 function drifterMc27ActivateFromPayment(contractId){
   drifterMc27RequireEnabled_();
   contractId=String(contractId||'').trim();
@@ -499,6 +540,8 @@ function drifterMc27ActivateFromPayment(contractId){
       };
       packageTab.sheet.appendRow(drifterMc27Row_(packageTab,pkg));
     }
+    // 同步建立開通起始正堂數；既有購買異動可安全重試不重複。
+    drifterMc27EnsureOpeningMovement_(ss,packageId,m['會員編號'],plan.total,start,contract['核發人員']);
     if(activation && (activation['契約編號']!==contractId||
         activation['會員編號']!==m['會員編號']||
         activation['堂數方案編號']!==packageId))
