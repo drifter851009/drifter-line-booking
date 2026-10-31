@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#151515">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<title>DRIFTER｜2027 會員待簽契約</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f1efeb;color:#191919;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",sans-serif}
+header{background:#171717;color:white;padding:20px 22px;display:flex;justify-content:space-between;align-items:center}
+header strong{letter-spacing:.12em}
+header span{font-size:11px;color:#aaa;letter-spacing:.1em}
+main{max-width:620px;margin:auto;padding:38px 20px 70px}
+.eyebrow{font-size:11px;color:#777;letter-spacing:.18em;font-weight:700}
+h1{font-size:38px;letter-spacing:-.045em;line-height:1.15;margin:14px 0 0}
+h1 small{display:block;font-size:19px;letter-spacing:0;margin-top:11px}
+p{font-size:14px;line-height:1.9;color:#65615d}
+.art{background:#272727;color:white;margin:28px 0;border-radius:17px;padding:26px;min-height:198px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.art:after{content:"D";font-size:230px;font-weight:900;color:rgba(255,255,255,.05);position:absolute;right:-10px;top:-65px}
+.art span{font-size:10px;letter-spacing:.18em;color:#b1b1b1}
+.art h2{font-size:26px;line-height:1.25;margin:0;z-index:1}
+.panel{background:white;padding:20px;border-radius:14px;border:1px solid #e2e0dc;margin-bottom:15px}
+.status{font-size:15px;font-weight:800}
+#detail{font-size:13px;margin:10px 0 0}
+.submit{width:100%;background:#1a1a1a;color:#fff;border:0;border-radius:11px;padding:18px 12px;font-size:15px;font-weight:800;cursor:pointer}
+.submit:disabled{background:#aaa;cursor:not-allowed}
+.foot{margin-top:21px;font-size:12px;color:#898683}
+.stage{border-left:3px solid #b6b0a7;padding-left:15px;margin:0 0 22px;color:#666;font-size:13px;line-height:1.8}
+@media(max-width:370px){h1{font-size:32px}}
+</style>
+<script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+<header><strong>DRIFTER</strong><span>CONTRACT ACCESS</span></header>
+<main>
+<div class="eyebrow">BODY PASSPORT / MEMBER CONTRACT</div>
+<h1>MEMBER CONTRACT<small>2027 會員待簽契約</small></h1>
+<p>以本人 LINE 帳號驗證身分後，安全查閱工作室核發給你的待簽契約。契約內容、方案與版本均由伺服器核對。</p>
+<div class="art"><span>DRIFTER / PRIVATE DOCUMENT</span><h2>你的方案，<br>由你本人查閱。</h2><span>IDENTITY VERIFIED · READ ONLY</span></div>
+<div class="stage">本頁目前只規劃「待簽契約唯讀查閱」。電子簽名、付款確認與方案開通均未開放，不會因開啟本頁而生效。</div>
+<div class="panel" aria-live="polite" aria-atomic="true">
+<div id="status" class="status">正在確認契約入口狀態…</div>
+<p id="detail">請從 DRIFTER LINE 官方帳號進入會員專屬入口。</p>
+</div>
+<form id="pendingForm" method="POST" action="https://script.google.com/macros/s/AKfycbwVJ_6J2b54Jmy8o8rdvSVtXREyNbiGfKVHtyAPD0qoSYJnfPT8JOY0_WwHSZeQQMUZmA/exec" autocomplete="off">
+<input type="hidden" name="action" value="memberContractPending">
+<input type="hidden" name="id_token" id="token">
+<button id="open" type="submit" class="submit" disabled>安全查看我的待簽契約</button>
+</form>
+<p class="foot">僅限已由工作室核對身分、LINE 帳號已完成綁定的會員本人。請勿轉傳個人契約資料。若沒有待簽契約，伺服器應顯示安全提示而非其他會員資料。</p>
+</main>
+<script>
+(function(){
+'use strict';
+const LIFF='2011856045-PfCKIOb3';
+const GAS='https://script.google.com/macros/s/AKfycbwVJ_6J2b54Jmy8o8rdvSVtXREyNbiGfKVHtyAPD0qoSYJnfPT8JOY0_WwHSZeQQMUZmA/exec';
+const REQUIRED_VERSION='MC-PENDING-2027-01';
+const status=document.getElementById('status');
+const detail=document.getElementById('detail');
+const token=document.getElementById('token');
+const button=document.getElementById('open');
+const form=document.getElementById('pendingForm');
+let ready=false;
+function say(title,message){status.textContent=title;detail.textContent=message;}
+function health(){
+  return new Promise(function(resolve){
+    const callback='drifterContractVersion_'+Math.random().toString(36).slice(2);
+    const script=document.createElement('script');
+    let completed=false;
+    const timeout=setTimeout(function(){finish(false);},9000);
+    function finish(ok){
+      if(completed)return;
+      completed=true;
+      clearTimeout(timeout);
+      delete window[callback];
+      script.remove();
+      resolve(ok);
+    }
+    window[callback]=function(r){
+      finish(!!(r&&r.ok===true&&r.memberContractPendingVersion===REQUIRED_VERSION&&r.memberContractReadOnlyEnabled===true));
+    };
+    script.onerror=function(){finish(false);};
+    script.src=GAS+'?action=health&callback='+encodeURIComponent(callback)+'&v=20271031';
+    document.head.appendChild(script);
+  });
+}
+async function init(){
+  try{
+    if(!(await health())){
+      say('待簽契約入口尚未啟用','工作室尚未完成安全串接或版本驗收。既有預約與 Body Passport 不受影響。');
+      return;
+    }
+    if(typeof liff==='undefined')throw Error('LINE SDK 未載入');
+    await liff.init({liffId:LIFF});
+    if(!liff.isLoggedIn()){
+      say('需要 LINE 登入','即將透過 LINE 驗證你的身分。');
+      liff.login({redirectUri:location.href});
+      return;
+    }
+    const idToken=liff.getIDToken();
+    if(!idToken)throw Error('無法取得 LINE ID Token');
+    token.value=idToken;
+    ready=true;
+    button.disabled=false;
+    say('已準備查閱','選擇下方按鈕後，系統會再次驗證 LINE 身分與會員綁定，僅查閱你本人尚未簽署的契約。');
+  }catch(err){
+    console.warn('Contract portal initialization failed',err);
+    say('目前無法驗證身分','請從 DRIFTER LINE 官方帳號重新開啟，或聯絡工作室。');
+  }
+}
+form.addEventListener('submit',function(e){
+  if(!ready||button.disabled||!token.value){e.preventDefault();return;}
+  ready=false;
+  button.disabled=true;
+  button.textContent='正在安全查詢…';
+});
+init();
+})();
+</script>
+</body>
+</html>
