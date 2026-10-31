@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-Hant"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive"><meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#171717">
+<title>DRIFTER｜會員契約簽署 QR Code</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f1efeb;color:#191919;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",sans-serif}
+header{background:#171717;color:white;padding:22px;font-weight:800;letter-spacing:.12em}
+main{max-width:520px;margin:auto;padding:30px 18px;text-align:center}
+section{background:white;padding:30px 22px;border:1px solid #deddd8;border-radius:18px}
+h1{font-size:25px;margin:8px 0 12px}
+#qr{margin:24px auto;display:flex;justify-content:center}
+#qr img,#qr canvas{width:256px;height:256px}
+p{color:#696560;line-height:1.85;font-size:14px}
+.label{font-size:11px;font-weight:800;letter-spacing:.15em;color:#91724e}
+.small{font-size:12px;color:#86817b}
+</style>
+<script src="./vendor/qrcode.min.js"></script>
+</head>
+<body><header>DRIFTER / STAFF</header>
+<main><section>
+<div class="label">BODY PASSPORT / MEMBER CONTRACT</div>
+<h1>會員契約簽署入口</h1>
+<p id="message">請掃描 QR Code，使用會員本人 LINE 登入。</p>
+<div id="qr" aria-label="2027 會員契約 LINE 掃描入口"></div>
+<p>第一次購買方案的會員，請先完成工作室核發的 LINE 綁定；已綁定會員可直接掃描此入口。</p>
+<p class="small">這張 QR Code 不含個人資料。契約由伺服器按本人已綁定的 LINE 帳號與核發申請查找，不會因掃描而簽署或開通。</p>
+</section></main>
+<script>
+(function(){'use strict';
+var target='https://liff.line.me/2011856045-PfCKIOb3/member-contract.html';
+var msg=document.getElementById('message');
+try{
+if(typeof QRCode!=='function')throw Error('missing QRCode library');
+new QRCode(document.getElementById('qr'),{
+text:target,width:256,height:256,correctLevel:QRCode.CorrectLevel.M
+});
+}catch(e){msg.textContent='QR Code 載入失敗，請由 LINE 官方帳號開啟會員契約入口。';}
+})();
+</script></body></html>
