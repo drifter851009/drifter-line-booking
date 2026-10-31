@@ -93,7 +93,7 @@ window[cb]=function(r){
 finish(!!(r&&r.ok===true&&r.memberContractPortalVersion==='MC-PORTAL-2027-01'&&r.memberContractPortalEnabled===true));
 };
 s.onerror=function(){finish(false);};
-s.src=GAS+'?action=health&callback='+encodeURIComponent(cb)+'&v=20271031';
+s.src=GAS+'?action=memberContractStatus&callback='+encodeURIComponent(cb)+'&v=20271031';
 document.head.appendChild(s);
 });
 }
