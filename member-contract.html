@@ -30,6 +30,10 @@ button{border:0;border-radius:10px;background:#23201d;color:#fff;padding:17px 15
 button:disabled{background:#aaa;cursor:not-allowed}
 button:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 .hint{font-size:12px;color:#827b72;line-height:1.8}
+.flow-note{font-size:12px;color:#71695d;margin:-12px 0 22px;line-height:1.75}
+.portal-link{display:block;text-align:center;background:#272421;color:#fff;text-decoration:none;border-radius:10px;padding:16px 14px;font-size:15px;font-weight:800;margin-top:16px}
+.portal-link:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.panel-note{font-size:13px;line-height:1.85;color:#6b6259;margin:10px 0 0}
 ol{margin:12px 0 0;padding-left:19px;color:#625e57;font-size:13px;line-height:2.1}
 @media(max-width:390px){h1{font-size:32px}.flow span{font-size:10px}}
 </style>
@@ -42,9 +46,10 @@ ol{margin:12px 0 0;padding-left:19px;color:#625e57;font-size:13px;line-height:2.
 <h1>MEMBER CONTRACT<small>會員電子契約</small></h1>
 <p>透過本人 LINE 帳號，確認工作室為你核發的會員方案與完整契約內容。完成電子簽署後，方案仍須經工作室確認付款才會啟用。</p>
 <div class="hero"><small>DRIFTER SPORTS MASSAGE</small><b>每一次選擇，<br>都有清楚的紀錄。</b><small>PRIVATE · VERIFIED · PERSONAL</small></div>
-<div class="flow" aria-label="會員申辦流程">
+<div class="flow" aria-label="會員申辦流程示意（非操作按鈕）">
 <span>LINE 驗證</span><span>閱讀契約</span><span>電子簽署</span><span>付款開通</span>
 </div>
+<p class="flow-note">以上是申辦流程示意，非可切換的分頁。簽署與付款開通需依序完成；付款由工作室確認。</p>
 <section class="panel">
 <div class="label">STEP 01 / VERIFY IDENTITY</div>
 <h2>確認本人會員身分</h2>
@@ -60,6 +65,12 @@ ol{margin:12px 0 0;padding-left:19px;color:#625e57;font-size:13px;line-height:2.
 <input type="hidden" name="id_token" id="idToken">
 <button id="open" type="submit" disabled>查看我的會員契約</button>
 </form>
+</section>
+<section class="panel">
+<div class="label">AFTER SIGNING / MEMBER ACCESS</div>
+<h2>已完成簽署？</h2>
+<p class="panel-note">本頁僅查詢尚待簽署的契約。已簽署的契約不會再次顯示在待簽清單；如需查閱簽署副本，請向 DRIFTER LINE 官方帳號申請。正式會員紀錄請由下方獨立入口查閱，系統會再次驗證本人 LINE 身分及查閱權限。</p>
+<a class="portal-link" href="./member-passport.html">前往我的 Body Passport</a>
 </section>
 <section class="panel">
 <div class="label">WHAT HAPPENS NEXT</div>
