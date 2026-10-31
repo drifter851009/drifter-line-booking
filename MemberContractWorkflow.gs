@@ -65,10 +65,17 @@ function drifterMc27RequireColumns_(tab,keys){
 function drifterMc27Objects_(tab){
   var last=tab.sheet.getLastRow();
   if(last<2)return [];
-  var rows=tab.sheet.getRange(2,1,last-1,tab.heads.length).getDisplayValues();
-  return rows.map(function(c,n){
+  var range=tab.sheet.getRange(2,1,last-1,tab.heads.length);
+  var display=range.getDisplayValues();
+  var raw=range.getValues();
+  return display.map(function(c,n){
     var data={_row:n+2};
-    tab.heads.forEach(function(h,i){data[h]=String(c[i]||'').trim();});
+    tab.heads.forEach(function(h,i){
+      var v=raw[n][i];
+      // AppSheet ChangeTimestamp may be a native Date. Convert UTC fields once.
+      data[h]=(/UTC$/.test(h)&&v instanceof Date&&!isNaN(v.getTime()))
+        ?v.toISOString():String(c[i]||'').trim();
+    });
     return data;
   }).filter(function(x){return tab.heads.some(function(h){return x[h]!=='';});});
 }
