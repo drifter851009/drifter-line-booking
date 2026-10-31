@@ -168,7 +168,10 @@ function drifterMc27MemberFromToken_(ss,token){
   var lineId=drifterMc27VerifyLine_(token);
   var tab=drifterMc27Table_(ss,CONFIG.MEMBER_SHEET);
   drifterMc27RequireColumns_(tab,['會員編號','姓名','會員狀態','會員端LINE綁定ID','會員端查閱狀態']);
-  var found=drifterMc27Objects_(tab).filter(function(r){return r['會員端LINE綁定ID']===lineId;});
+  var allMembers=drifterMc27Objects_(tab);
+  var found=allMembers.filter(function(r){return r['會員端LINE綁定ID']===lineId;});
+  if(found.length===1 && allMembers.filter(function(r){return r['會員編號']===found[0]['會員編號'];}).length!==1)
+    throw Error('會員編號重複，禁止進入契約查閱');
   if(found.length!==1||found[0]['會員狀態']!=='啟用'||found[0]['會員端查閱狀態']!=='啟用')
     throw Error('此 LINE 帳號尚未獲得本人契約查閱權限');
   return {member:found[0],lineId:lineId};
@@ -215,6 +218,10 @@ function drifterMc27IssueFromAppSheet(requestId){
     var p=DRIFTER_MC27.plan[r['方案代碼']];
     if(!p)throw Error('方案代碼無效');
     var m=drifterMc27Member_(ss,r['會員編號']);
+    var pendingOthers=drifterMc27Objects_(ct).filter(function(x){
+      return x['會員編號']===m['會員編號']&&x['契約狀態']==='待簽署';
+    });
+    if(pendingOthers.length)throw Error('此會員已有待簽署契約，請先處理原契約');
     if(!m['姓名'])throw Error('會員姓名缺漏');
     if(m['會員狀態']!=='啟用')throw Error('會員狀態尚未啟用');
     var created=drifterMc27Utc_();
