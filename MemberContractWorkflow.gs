@@ -492,7 +492,7 @@ function drifterMc27ActivateFromPayment(contractId){
       var pkg={
         '方案編號':packageId,'會員編號':m['會員編號'],'方案名稱':plan.name,
         '購買日期':start,'總堂數':plan.total,'已使用堂數':0,
-        '剩餘堂數':plan.total,'實收金額':plan.price,'方案狀態':'啟用',
+        '剩餘堂數':plan.total,'實收金額':plan.price,'方案狀態':'使用中',
         '到期日':end,'備註':'電子契約 '+contractId,
         '建立時間':drifterMc27Utc_(),'方案原價':plan.price,
         '合作折抵':0,'付款方式':contract['付款方式']
