@@ -295,7 +295,7 @@ function drifterMc27Review_(p){
   var nonce=Utilities.getUuid().replace(/-/g,'')+Utilities.getUuid().replace(/-/g,'');
   var now=drifterMc27Utc_();
   var state={memberId:verified.member['會員編號'],contractId:c['契約編號'],
-    hash:c['契約文件SHA256'],reviewUTC:now};
+    hash:c['契約文件SHA256'],reviewUTC:now,idToken:String(p.id_token||'')};
   CacheService.getScriptCache().put('mc27:'+nonce,JSON.stringify(state),1200);
   var fields=[
     ['確認方案','我已核對本次購買方案與實付金額'],
@@ -318,11 +318,10 @@ function drifterMc27Review_(p){
     '<p class="muted">契約原文 SHA-256：'+drifterMc27Escape_(c['契約文件SHA256'])+'</p>'+
     '<form method="POST" action="https://script.google.com/macros/s/AKfycbwVJ_6J2b54Jmy8o8rdvSVtXREyNbiGfKVHtyAPD0qoSYJnfPT8JOY0_WwHSZeQQMUZmA/exec">'+
     '<input type="hidden" name="action" value="memberContractSign">'+
-    '<input type="hidden" name="id_token" value="'+drifterMc27Escape_(p.id_token)+'">'+
     '<input type="hidden" name="contract_id" value="'+drifterMc27Escape_(c['契約編號'])+'">'+
     '<input type="hidden" name="nonce" value="'+drifterMc27Escape_(nonce)+'">'+
     checks+
-    '<label class="check">本人簽署姓名（請輸入會員實名）<input type="text" required name="signature_name" maxlength="80" autocomplete="name"></label>'+
+    '<label class="check"><input type="checkbox" required name="確認本人實名" value="yes"> 我確認本頁會員姓名與本人一致，並同意以本人身分電子簽署</label>'+
     '<p class="muted">按下送出後，系統才會建立本人電子簽署紀錄；付款確認與方案開通為另外的作業。</p>'+
     '<button type="submit">我已閱讀並確認，送出電子簽署</button></form>';
   return drifterMc27Page_(body);
@@ -330,19 +329,19 @@ function drifterMc27Review_(p){
 function drifterMc27Sign_(p){
   var result=drifterMc27Lock_(function(){
     var ss=drifterMc27SS_();
-    var verified=drifterMc27MemberFromToken_(ss,p.id_token);
-    var member=verified.member,nonce=String(p.nonce||'');
+    var nonce=String(p.nonce||'');
     if(!/^[0-9a-f]{64}$/i.test(nonce))throw Error('簽署驗證資料無效');
     var stateRaw=CacheService.getScriptCache().get('mc27:'+nonce);
     if(!stateRaw)throw Error('簽署頁面已逾時，請重新開啟契約');
     var state=JSON.parse(stateRaw);
+    var verified=drifterMc27MemberFromToken_(ss,state.idToken);
+    var member=verified.member;
     if(state.memberId!==member['會員編號']||state.contractId!==String(p.contract_id||''))
       throw Error('簽署身份與契約不一致');
     var record=drifterMc27Pending_(ss,member).validated,c=record.contract;
     if(c['契約編號']!==state.contractId||c['契約文件SHA256']!==state.hash)
       throw Error('契約版本或文件內容已有變更');
-    if(String(p.signature_name||'').trim()!==member['姓名'])
-      throw Error('電子簽署姓名與會員資料不一致');
+    if(p['確認本人實名']!=='yes')throw Error('會員尚未確認本人簽署');
     var required=['確認方案','確認總堂數','確認效期','確認服務內容','確認退費規則','同意電子文件','確認個資告知'];
     if(required.some(function(k){return p[k]!=='yes';}))throw Error('尚有契約確認項目未完成');
     var st=drifterMc27Table_(ss,DRIFTER_MC27.sheetSignatures);
