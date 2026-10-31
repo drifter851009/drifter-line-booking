@@ -72,20 +72,9 @@ function drifterMemberContractPendingPreflight(){
   if(DRIFTER_MCP_LOOKUP.allowedVersions.length)throw Error('開發階段不得啟用正式簽署');
   return '待簽契約預檢通過；正式簽署尚未啟用。';
 }
-/** Internal only. Caller must use drifterMc2027ResolveBoundMember_ first. */
-function drifterMcpLookupForVerifiedMember_(verifiedMemberId){
-  if(!DRIFTER_MCP_LOOKUP.allowedVersions.length)throw Error('契約簽署尚未啟用');
-  var id=String(verifiedMemberId||'').trim();
-  if(!id)throw Error('無效會員編號');
-  var ss=SpreadsheetApp.openById(CONFIG.SPREADSHEET_ID);
-  var c=drifterMcpLookupTable_(ss,DRIFTER_MCP_LOOKUP.contractSheet,
-    ['契約編號','會員編號','方案名稱','實付金額','付費堂數','贈送堂數',
-     '總堂數','方案效期月數','契約版本','契約文件SHA256','簽約申請ID',
-     '契約狀態','簽署期限UTC','簽署完成UTC']);
-  var r=drifterMcpLookupTable_(ss,DRIFTER_MCP_LOOKUP.requestSheet,
-    ['核發申請ID','會員編號','方案代碼','處理狀態','契約編號',
-     '契約版本','簽署期限UTC']);
-  return drifterMcpLookupCheck_(id,c,r,DRIFTER_MCP_LOOKUP.allowedVersions,Date.now());
+/** Integration remains disabled until verified membership is connected. */
+function drifterMcpLookupForVerifiedMember_(){
+  throw Error('會員身分及契約授權尚未完成正式串接');
 }
 function drifterMemberContractPendingSelfTest(){
   var version='TEST-ONLY',expiry='2027-01-03T00:00:00.000Z';
