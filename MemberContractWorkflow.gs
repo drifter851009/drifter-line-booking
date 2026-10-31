@@ -33,6 +33,16 @@ const DRIFTER_MC27 = {
   }
 };
 
+/** 工作室表單使用中文顯示，保留舊方案代碼相容性。 */
+function drifterMc27Plan_(value){
+  var key=String(value||'').trim();
+  var aliases={
+    '基礎保養｜12堂／18個月／$15,000':'BASIC_10_2_2027',
+    '進階保養｜25堂／24個月／$25,000':'ADVANCED_20_5_2027'
+  };
+  return DRIFTER_MC27.plan[aliases[key]||key]||null;
+}
+
 function drifterMc27Enabled_(){
   return DRIFTER_MC27.enabled === true &&
     /^DRIFTER-MEMBER-2027-V[0-9.]+$/.test(DRIFTER_MC27.approvedVersion) &&
@@ -165,7 +175,7 @@ function drifterMc27ValidateContract_(ss,c,m,reqs){
   if(!r||r['會員編號']!==m['會員編號']||r['契約編號']!==c['契約編號']||
     r['契約版本']!==c['契約版本']||r['處理狀態']!=='已核發'||
     Date.parse(r['簽署期限UTC'])!==exp)throw Error('契約申請關聯不一致');
-  var p=DRIFTER_MC27.plan[r['方案代碼']];
+  var p=drifterMc27Plan_(r['方案代碼']);
   if(!p)throw Error('方案代碼無效');
   var cols=['實付金額','付費堂數','贈送堂數','總堂數','方案效期月數'];
   [p.price,p.paid,p.bonus,p.total,p.months].forEach(function(v,i){
@@ -244,7 +254,7 @@ function drifterMc27IssueFromAppSheet(requestId){
     }
     if(r['處理狀態']!=='待核發')throw Error('此申請狀態不可核發');
     if(r['契約類型']!=='新購'&&r['契約類型']!=='續購')throw Error('契約類型無效');
-    var p=DRIFTER_MC27.plan[r['方案代碼']];
+    var p=drifterMc27Plan_(r['方案代碼']);
     if(!p)throw Error('方案代碼無效');
     var m=drifterMc27Member_(ss,r['會員編號']);
     var pendingOthers=drifterMc27Objects_(ct).filter(function(x){
@@ -431,7 +441,7 @@ function drifterMc27ActivateFromPayment(contractId){
       req['契約編號']!==contractId||req['契約版本']!==contract['契約版本']||
       req['處理狀態']!=='已核發')throw Error('契約與核發申請不一致');
     if(contract['契約版本']!==DRIFTER_MC27.approvedVersion)throw Error('契約版本未核准');
-    var plan=DRIFTER_MC27.plan[req['方案代碼']];
+    var plan=drifterMc27Plan_(req['方案代碼']);
     if(!plan||contract['方案名稱']!==plan.name)throw Error('方案不存在或方案名稱不一致');
     var numeric={'實付金額':plan.price,'付費堂數':plan.paid,'贈送堂數':plan.bonus,
       '總堂數':plan.total,'方案效期月數':plan.months};
