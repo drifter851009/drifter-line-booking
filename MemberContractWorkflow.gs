@@ -433,7 +433,7 @@ function drifterMc27EnsureOpeningMovement_(ss,packageId,memberId,total,start,ope
   var mt=drifterMc27Table_(ss,DRIFTER_MC27.sheetMovements);
   drifterMc27RequireColumns_(mt,[
     '異動編號','方案編號','會員編號','異動日期','異動類型',
-    '堂數增減','異動後餘額','操作人員','備註','建立時間'
+    '堂數增減','服務紀錄編號','異動後餘額','操作人員','備註','建立時間'
   ]);
   var rows=drifterMc27Objects_(mt).filter(function(r){
     return r['方案編號']===packageId&&r['異動類型']==='購買';
@@ -448,18 +448,23 @@ function drifterMc27EnsureOpeningMovement_(ss,packageId,memberId,total,start,ope
   var movementId='MC27O'+drifterMc27Hex_(packageId).slice(0,12);
   var collision=drifterMc27One_(drifterMc27Objects_(mt),'異動編號',movementId);
   if(collision)throw Error('堂數帳本異動編號衝突');
-  var dateTime=Utilities.formatDate(new Date(),DRIFTER_MC27.timezone,'yyyy-MM-dd HH:mm:ss');
+  if(!Number.isInteger(total)||total<=0||!/^\d{4}-\d{2}-\d{2}$/.test(start))
+    throw Error('方案起始堂數或日期無效');
+  var ymd=start.split('-').map(Number);
+  var localDate=new Date(ymd[0],ymd[1]-1,ymd[2],12,0,0);
+  if(Utilities.formatDate(localDate,DRIFTER_MC27.timezone,'yyyy-MM-dd')!==start)
+    throw Error('堂數購買日期無效');
   var movement={
     '異動編號':movementId,
     '方案編號':packageId,
     '會員編號':memberId,
-    '異動日期':start,
+    '異動日期':localDate,
     '異動類型':'購買',
     '堂數增減':total,
     '異動後餘額':total,
     '操作人員':operator||'2027契約自動開通',
     '備註':'2027電子契約起始堂數／方案權益入帳（不代表新增收款）',
-    '建立時間':dateTime
+    '建立時間':new Date()
   };
   mt.sheet.appendRow(drifterMc27Row_(mt,movement));
   return movementId;
