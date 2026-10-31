@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#171717">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; form-action 'none'; connect-src 'none'; base-uri 'none'">
+<title>DRIFTER｜Body Passport｜電子契約開發預覽</title>
+<style>
+:root{color-scheme:light;--ink:#1c1b19;--quiet:#635e57;--gold:#b7956c;--cream:#f5f2ec;--paper:#fffefa;--edge:#ded6cb;--black:#171717}
+*{box-sizing:border-box}body{margin:0;background:var(--cream);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","Noto Sans TC",Arial,sans-serif;line-height:1.65}
+header{background:var(--black);color:#f6eee1;min-height:71px;display:flex;align-items:center;justify-content:space-between;padding:14px max(22px,calc((100% - 840px)/2));gap:16px}
+.logo{letter-spacing:.22em;font-weight:850;font-size:20px}.kicker{font-size:11px;letter-spacing:.12em;color:#b9ab96;text-align:right}
+main{max-width:840px;margin:0 auto;padding:32px 20px 80px}
+.ribbon{display:flex;gap:10px;align-items:center;border:1px solid #ba9367;background:#fff9ed;color:#654a2b;padding:13px 15px;border-radius:9px;font-weight:700;font-size:13px}
+h1{font-size:clamp(28px,5vw,42px);line-height:1.24;letter-spacing:-.035em;margin:22px 0 9px}
+.subtitle{color:var(--quiet);font-size:14px;margin:0 0 26px}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:20px 0 34px}
+.step{border-radius:9px;padding:12px 7px;border:1px solid var(--edge);background:#fcfaf7;text-align:center;color:#6a6258;font-size:12px;font-weight:700}
+.step.active{background:#27231d;color:#f6e8d2;border-color:#27231d}
+.step small{display:block;font-size:10px;letter-spacing:.1em;opacity:.8}
+.section{background:var(--paper);border:1px solid var(--edge);border-radius:15px;padding:25px;margin-bottom:18px;box-shadow:0 3px 14px rgba(40,25,12,.035)}
+.num{letter-spacing:.17em;font-weight:700;font-size:11px;color:#957452}
+h2{font-size:20px;margin:5px 0 16px;line-height:1.4}
+.plan-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.plan{display:block;cursor:pointer;position:relative;border:1px solid var(--edge);border-radius:11px;padding:17px 16px;background:#fff}
+.plan:has(input:checked){border-color:#8d663c;background:#fffbf3;outline:2px solid #e1cfb6}
+.plan input{accent-color:#7b5631;position:absolute;right:14px;top:15px;width:19px;height:19px}
+.plan-title{font-size:14px;font-weight:800;padding-right:26px}.price{font-size:29px;font-weight:800;letter-spacing:-.025em;margin:6px 0}
+.plan-detail{font-size:13px;color:#62584e}
+.summary{background:#22201d;color:#f4eee4;padding:17px 20px;border-radius:12px;margin-top:16px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.summary strong{font-size:19px}.summary small{display:block;color:#b9ab96;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{border-bottom:1px solid #e9e3da;text-align:left;padding:10px 7px}th{color:#756c60;font-size:12px;font-weight:700}
+.detail{margin:0;color:#625e59;font-size:13px}
+.legal-wrap{border:1px solid var(--edge);background:white;border-radius:9px;padding:0 17px;max-height:375px;overflow:auto;overscroll-behavior:contain}
+.legal-wrap h3{font-size:14px;margin:19px 0 8px}.legal-wrap p,.legal-wrap li{font-size:12.5px;color:#4e4841;margin:6px 0;line-height:1.85}.legal-wrap ul,.legal-wrap ol{padding-left:20px}
+.legal-wrap .warning{background:#fff5e7;border-left:3px solid var(--gold);padding:8px 10px;color:#685133}
+.legal-note{color:#6b6156;font-size:12px;margin-top:11px}
+.agreements{display:grid;gap:11px}
+.agreement{display:flex;align-items:flex-start;gap:12px;font-size:13px;line-height:1.7;padding:13px;border-radius:9px;background:#faf8f4;border:1px solid #ede7df;cursor:pointer}
+.agreement input{flex:none;width:20px;height:20px;accent-color:#825f39;margin:1px 0}
+.actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:20px}
+button{border:0;background:#24211e;color:#fff;padding:16px 21px;font-weight:800;border-radius:10px;font-size:14px;cursor:pointer}
+button:hover{background:#443728}button:focus-visible,input:focus-visible{outline:3px solid #c4a77f;outline-offset:2px}
+.btn-secondary{border:1px solid #bfb1a0;background:#fff;color:#38312b}
+.btn-secondary:hover{background:#f2ebe1}
+.status{font-size:13px;color:#605c55;min-height:25px;padding-top:14px;white-space:pre-wrap}
+.status.error{color:#9b322b;font-weight:700}.status.ok{color:#2f6747;font-weight:700}
+.not-live{border:1px dashed #c9b8a2;padding:17px;border-radius:10px;background:#fcf8ef;margin-top:17px;font-size:13px}
+footer{font-size:12px;color:#766e63;text-align:center;margin-top:30px}
+@media(max-width:560px){main{padding:22px 14px 60px}.section{padding:18px 15px}.plan-grid{grid-template-columns:1fr}.steps{gap:4px}.step{font-size:10px;padding:9px 3px}.kicker{font-size:9px}header{padding:14px 16px}}
+</style>
+</head>
+<body>
+<header><div class="logo">DRIFTER</div><div class="kicker">BODY PASSPORT<br>MEMBER AGREEMENT · PREVIEW</div></header>
+<main>
+<div class="ribbon" role="status"><span aria-hidden="true">⚠</span><span>開發預覽版｜不提供正式簽署、付款或會員開通</span></div>
+<h1>會員方案電子契約</h1>
+<p class="subtitle">2027 年度會員制度 · 契約草案 V1.2 · 畫面流程驗收專用</p>
+<div class="steps" aria-label="會員開通流程">
+<div class="step active"><small>STEP 01</small>確認方案</div>
+<div class="step"><small>STEP 02</small>審閱契約</div>
+<div class="step"><small>STEP 03</small>簽署驗證</div>
+<div class="step"><small>STEP 04</small>付款後開通</div>
+</div>
+<section class="section" aria-labelledby="choose-title">
+<div class="num">01 / PLAN REVIEW</div><h2 id="choose-title">確認會員方案</h2>
+<div class="plan-grid" role="radiogroup" aria-label="會員方案">
+<label class="plan"><input type="radio" name="plan" value="basic" checked><div class="plan-title">基礎保養｜10＋2 堂</div><div class="price">NT$15,000</div><div class="plan-detail">付費 10 堂＋贈送 2 堂<br>共 12 堂 · 使用期限 18 個月<br>平均每堂 NT$1,250</div></label>
+<label class="plan"><input type="radio" name="plan" value="advanced"><div class="plan-title">進階保養｜20＋5 堂</div><div class="price">NT$25,000</div><div class="plan-detail">付費 20 堂＋贈送 5 堂<br>共 25 堂 · 使用期限 24 個月<br>平均每堂 NT$1,000</div></label>
+</div>
+<div class="summary" aria-live="polite"><div><small>目前選擇（示範）</small><strong id="summaryTitle">基礎保養 10＋2 堂</strong></div><div style="text-align:right"><small>示範方案總價</small><strong id="summaryPrice">NT$15,000</strong></div></div>
+<p class="legal-note">正式版本將由工作室後端帶入會員姓名、會員編號、訂單金額及確切起訖日期；此頁不接收真實個資。</p>
+</section>
+<section class="section" aria-labelledby="details-title">
+<div class="num">02 / SERVICE DETAILS</div><h2 id="details-title">服務與退費計算摘要</h2>
+<table>
+<tr><th>項目</th><th>本次方案示範值</th></tr>
+<tr><td>方案總堂數（含贈送）</td><td id="count">12 堂</td></tr>
+<tr><td>每堂平均服務價值</td><td id="unit">NT$1,250</td></tr>
+<tr><td>期限</td><td id="months">18 個月</td></tr>
+<tr><td>每次基本預約服務</td><td>60 分鐘；加時由現場評估，最多 120 分鐘</td></tr>
+<tr><td>一般加時</td><td>每 30 分鐘 NT$600；會員適用方案條件另行約定</td></tr>
+<tr><td>剩餘服務價值</td><td>實付金額 ÷ 總堂數 × 剩餘總堂數</td></tr>
+</table>
+<p class="legal-note">退款比例及期限目前仍需完成最終契約法規審核，不得將本預覽畫面視為已生效的正式權利義務內容。</p>
+</section>
+<section class="section" aria-labelledby="terms-title">
+<div class="num">03 / AGREEMENT REVIEW</div><h2 id="terms-title">閱讀完整契約草案</h2>
+<div class="legal-wrap" tabindex="0" aria-label="會員契約草案內容（可捲動）">
+<h3>DRIFTER 運動按摩工作室｜2027 會員堂數方案購買暨服務使用契約（V1.2 草案）</h3>
+<p class="warning">此為開發展示用草案，不是供會員正式簽署的契約。退費比例、贈送堂數認列、效期及付款期限仍須依適用業別完成審核。</p>
+<h3>第一條｜契約當事人</h3>
+<p>甲方為經工作室核對身分之購買會員；乙方為 DRIFTER 運動按摩工作室之實際締約主體。正式版本應列示雙方必要的姓名、聯絡方式、契約編號、契約審閱提供日及簽署時間。</p>
+<h3>第二條｜會員購買方案</h3>
+<p>基礎保養方案：實付 NT$15,000，付費 10 堂、贈送 2 堂，共 12 堂，使用期限 18 個月，每堂平均價值 NT$1,250。進階保養方案：實付 NT$25,000，付費 20 堂、贈送 5 堂，共 25 堂，使用期限 24 個月，每堂平均價值 NT$1,000。正式訂單應列示實付金額及起訖日期。</p>
+<h3>第三條｜服務內容及施作</h3>
+<p>提供運動按摩、運動後恢復及日常疲勞恢復服務。每次基本預約 60 分鐘；依需求和適用性評估使用徒手按摩、筋膜刀、適當伸展等方式。加時由工作室現場評估，每 30 分鐘 NT$600，每次最長 120 分鐘；會員免費加時以購買時明示且有效的條件為準。本服務不替代醫療診斷與治療。</p>
+<h3>第四條｜堂數使用與扣除</h3>
+<p>每完成一次符合方案約定的基本服務，原則上扣除 1 堂，並應有服務紀錄與會員核對程序。付費堂數及贈送堂數一併計入總可使用堂數，已使用堂數由總堂數扣除，會員可查詢剩餘堂數。</p>
+<h3>第五條｜會員期限</h3>
+<p>基礎保養 18 個月，進階保養 24 個月；原則上自付款完成且方案成立日起算。實際起訖日期須於正式簽署前明確顯示。依法須暫停、展延、終止或退費者，依適用規範處理。</p>
+<h3>第六條｜契約終止與退費（待審核）</h3>
+<p>方案每堂平均價值＝實付金額 ÷ 約定總服務堂數（含贈送）。剩餘服務價值＝剩餘總堂數 × 每堂平均價值。工作室擬定一般退費級距：購買後 1 個月內剩餘服務價值之 80%；超過 1 個月至滿 6 個月 50%；超過 6 個月原則上不予退費。擬於完整申請後 3 個月內退款。如適用法律另有要求或工作室違約，不以本擬定級距排除依法享有的權利。</p>
+<p class="warning">前述比例、期間、贈送堂數與退款期限均尚未完成最終法律審核。正式版本不得在審核前開放簽署。</p>
+<h3>第七條｜預約與異動</h3>
+<p>會員使用指定管道預約，依正式確認紀錄為準；取消、修改及遲到依當期有效且合法公告的規範處理。因工作室原因無法提供服務時，依法提供適當改期或其他處理方式。</p>
+<h3>第八條｜新舊會員銜接</h3>
+<p>本契約原則上適用 2027 年新購或新續購方案。2027 年以前購買的舊方案依原契約及適用規範辦理，不因新制度上線而單方取消既有合法權益。</p>
+<h3>第九條｜電子文件及簽署</h3>
+<p>正式簽署前，工作室應提供完整契約及依法應有的審閱期間。會員需經 LINE 身分核驗、確認實際方案、金額、期限及條款後，自行勾選並明確送出。系統保存契約版本、完整文字、內容雜湊、簽署時間、核驗及勾選紀錄，並提供可保存的契約副本。</p>
+<h3>第十條｜個人資料與隱私</h3>
+<p>工作室僅在必要範圍內處理會員管理、預約、堂數與履約資料。應另提供完整個資告知事項，對健康相關資訊採取保護措施；行銷同意須另行選擇，不得預設勾選。</p>
+<h3>第十一條｜契約變更與爭議</h3>
+<p>成立後不得單方面不利變更已約定的主要權益。未盡事項依適用中華民國法令與有效約定辦理；如有爭議，雙方得協商、申訴、調解或依法救濟。</p>
+</div>
+<p class="legal-note">這是契約內容的開發展示稿，正式上線需要使用已核准的全文快照與不可變更的契約版本。</p>
+</section>
+<section class="section" aria-labelledby="check-title">
+<div class="num">04 / CONFIRMATION PREVIEW</div><h2 id="check-title">確認閱讀項目</h2>
+<p class="detail" style="margin-bottom:15px">下列勾選僅用於檢查表單呈現與操作，不構成法律上的電子簽署。</p>
+<div class="agreements">
+<label class="agreement"><input type="checkbox" data-required><span>我已審閱完整契約草案，了解正式簽約前應有的審閱機會。</span></label>
+<label class="agreement"><input type="checkbox" data-required><span>我已確認所選方案、實付價格、付費及贈送的總堂數。</span></label>
+<label class="agreement"><input type="checkbox" data-required><span>我了解方案使用期限，正式訂單將提供實際生效日及到期日。</span></label>
+<label class="agreement"><input type="checkbox" data-required><span>我已閱讀服務內容、堂數核銷與加時規則。</span></label>
+<label class="agreement"><input type="checkbox" data-required><span>我已閱讀退費計算方式，並知悉目前比例與期限仍待最終審核。</span></label>
+<label class="agreement"><input type="checkbox" data-required><span>我了解正式電子簽署需要 LINE 身分核驗、保存契約副本及獨立確認送出。</span></label>
+<label class="agreement"><input type="checkbox" data-required><span>我了解正式版本將另提供完整個人資料蒐集告知事項。</span></label>
+</div>
+<div class="actions">
+<button type="button" id="check">檢查勾選完成度（示範）</button>
+<button type="button" class="btn-secondary" id="reset">清除示範勾選</button>
+</div>
+<div id="status" class="status" role="status" aria-live="polite">本頁沒有連接 LINE、GAS、Google Sheets、付款或會員開通系統。</div>
+<div class="not-live"><strong>正式簽署功能尚未啟用</strong><br>這個開發版本不保存資料、不產生法律效力、不發出簽約通知，也不會變更任何會員堂數。正式版須先完成身分驗證、契約法規審核、後端安全控管與全流程測試。</div>
+</section>
+<footer>DRIFTER SPORTS MASSAGE STUDIO · BODY PASSPORT · DEVELOPMENT PREVIEW</footer>
+</main>
+<script>
+(function(){
+'use strict';
+var p={
+basic:{title:'基礎保養 10＋2 堂',price:'NT$15,000',count:'12 堂',unit:'NT$1,250',months:'18 個月'},
+advanced:{title:'進階保養 20＋5 堂',price:'NT$25,000',count:'25 堂',unit:'NT$1,000',months:'24 個月'}
+};
+var radios=document.querySelectorAll('input[name="plan"]');
+var checks=document.querySelectorAll('input[data-required]');
+var status=document.getElementById('status');
+function update(){
+var selected=document.querySelector('input[name="plan"]:checked');
+var item=p[selected?selected.value:'basic'];
+document.getElementById('summaryTitle').textContent=item.title;
+document.getElementById('summaryPrice').textContent=item.price;
+document.getElementById('count').textContent=item.count;
+document.getElementById('unit').textContent=item.unit;
+document.getElementById('months').textContent=item.months;
+status.textContent='本頁沒有連接 LINE、GAS、Google Sheets、付款或會員開通系統。';
+status.className='status';
+}
+radios.forEach(function(r){r.addEventListener('change',update)});
+document.getElementById('check').addEventListener('click',function(){
+var left=Array.from(checks).filter(function(c){return !c.checked}).length;
+if(left){
+status.className='status error';
+status.textContent='尚有 '+left+' 項未勾選。這只是表單展示，未送出任何資料。';
+}else{
+status.className='status ok';
+status.textContent='7 項示範勾選已完成；未進行身分驗證、法律簽署、儲存或會員開通。';
+}
+});
+document.getElementById('reset').addEventListener('click',function(){
+checks.forEach(function(c){c.checked=false});
+status.className='status';
+status.textContent='已清除本頁示範勾選；沒有任何資料被儲存。';
+});
+update();
+})();
+</script>
+</body>
+</html>
